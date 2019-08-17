@@ -1,6 +1,6 @@
 import {A3sAccess, A3SFiles} from 'src/a3sAccess';
 import {A3SChangelog} from 'src/model/a3sChangelog';
-import {A3SRepository} from 'src/model/a3sRepository';
+import {A3SAutoconfig} from 'src/model/a3SAutoconfig';
 import {A3SServerInfo} from 'src/model/a3sServerInfo';
 import {A3SSyncTree} from 'src/model/a3sSync';
 import {readFile} from 'fs';
@@ -24,10 +24,10 @@ export class A3sDirectory implements A3sAccess {
             .then(json => Promise.resolve(json as A3sEvents));
     }
 
-    public getRepository(): Promise<A3SRepository> {
+    public getRepository(): Promise<A3SAutoconfig> {
         return this
             .getFile(A3SFiles.AUTOCONFIG)
-            .then(json => Promise.resolve(json as A3SRepository));
+            .then(json => Promise.resolve(json as A3SAutoconfig));
     }
 
     public getServerInfo(): Promise<A3SServerInfo> {

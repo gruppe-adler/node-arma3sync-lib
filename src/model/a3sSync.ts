@@ -7,31 +7,15 @@ export interface A3SSyncTree {
     list?: A3SSyncTree[];
 }
 
-export class A3SSyncTreeNode implements A3SSyncTree {
-    constructor(
-        public name: string,
-        public markAsAddon: boolean,
-        public destinationPath: string,
-        public updated: boolean,
-        public deleted: boolean,
-        public hidden: boolean,
-        public parent?: A3SSyncTree,
-        public list?: A3SSyncTree[]
-    ) {}
+export interface A3SSyncTreeNode extends A3SSyncTree {
+    markAsAddon: boolean,
+    hidden: boolean
 }
 
-export class A3SSyncTreeLeaf implements A3SSyncTree {
-    constructor(
-        public name: string,
-        public sha1: string,
-        public compressedSize: number, // long
-        public complete: number, // long
-        public destinationPath: string,
-        public localSha1: string,
-        public updated: boolean,
-        public deleted: boolean,
-        public compressed: boolean,
-        public parent?: A3SSyncTree,
-        public list?: A3SSyncTree[]
-    ) {}
+export interface A3SSyncTreeLeaf extends A3SSyncTree {
+        sha1: string,
+        compressedSize: number, // long
+        complete: number, // long
+        localSha1: string,
+        compressed: boolean,
 }

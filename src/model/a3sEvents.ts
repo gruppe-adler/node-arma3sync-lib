@@ -1,11 +1,9 @@
-export class A3sEvents {
-    public list: A3sEvent[];
+export interface A3sEvents {
+    list: A3sEvent[]
 }
-export class A3sEvent {
-    constructor(
-        public name: string,
-        public description: string,
-        public addonNames: Map<string, boolean>,
-        public userConfigFolderNames: Map<string, boolean>
-    ) {}
+export interface A3sEvent {
+    name: string
+    description: string
+    addonNames: Map<string, boolean>
+    userConfigFolderNames: Map<string, boolean>
 }
