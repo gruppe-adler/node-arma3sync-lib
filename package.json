@@ -1,0 +1,17 @@
+{
+  "name": "node-a3s-lib",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "jest": "^24.9.0",
+    "java.io": "^2.4.0",
+    "@types/node": "^12.7.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
