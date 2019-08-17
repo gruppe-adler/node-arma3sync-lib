@@ -1,4 +1,5 @@
 import {A3sDirectory} from './a3sDirectory';
+import {A3sEvents} from 'src/model/a3sEvents';
 
 test('getting events from example file', (done) => {
     const access = new A3sDirectory(__dirname + '/../resources/test/a3s');
@@ -11,3 +12,7 @@ test('getting events from example file', (done) => {
         done();
     });
 });
+
+test('aaand saving events will produce the same file again', () => {
+    A3sEvents
+})
