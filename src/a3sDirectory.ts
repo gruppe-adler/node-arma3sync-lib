@@ -3,11 +3,11 @@ import {A3SChangelog} from 'src/model/a3sChangelog';
 import {A3SAutoconfig} from 'src/model/a3SAutoconfig';
 import {A3SServerInfo} from 'src/model/a3sServerInfo';
 import {A3SSyncTree} from 'src/model/a3sSync';
-import {readFile} from 'fs';
+import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
-import {gunzip} from 'zlib';
+import {gunzip, gzip} from 'zlib';
 import {A3sEvents} from 'src/model/a3sEvents';
-import {InputObjectStream} from 'java.io';
+import {InputObjectStream, OutputObjectStream, normalize} from 'java.io';
 
 export class A3sDirectory implements A3sAccess {
     constructor(private directory: string)  {}
@@ -22,6 +22,10 @@ export class A3sDirectory implements A3sAccess {
         return this
             .getFile(A3SFiles.EVENTS)
             .then(json => Promise.resolve(json as A3sEvents));
+    }
+
+    public setEvents(events: A3sEvents): Promise<void> {
+        return this.setFile(A3SFiles.EVENTS, events);
     }
 
     public getRepository(): Promise<A3SAutoconfig> {
@@ -47,5 +51,15 @@ export class A3sDirectory implements A3sAccess {
         return promisify(readFile)(path)
             .then(rawFile => promisify(gunzip)(rawFile))
             .then((unzippedBuffer: Buffer) => Promise.resolve(new InputObjectStream(unzippedBuffer, false).readObject()));
+    }
+
+    private setFile(name: string, contents: object): Promise<void> {
+        const path = this.directory + '/' + name;
+        const objectStream = new OutputObjectStream();
+        let foo = normalize(contents);
+        return Promise
+            .resolve(new OutputObjectStream().writeObject(foo))
+            .then(buffer => promisify(gzip)(buffer))
+            .then(rawFile => promisify(writeFile)(path, rawFile))
     }
 }

@@ -1,12 +1,21 @@
 declare module 'java.io' {
-    function OutputObjectStream(): any;
-    function addObject(classname: any, convertor: any): any;
-    function normalize(): any;
+    export function addObject(classname: any, convertor: any): any;
     function constants(): any;
+    export function normalize(obj: boolean|string|number, type?: 'string'|'boolean'|'int'|'short'|'long'|'char'|'byte'|'float'|'double'): object
+    export function normalize(obj: object|any[], type: 'string'|'boolean'|'int'|'short'|'long'|'char'|'byte'|'float'|'double'): object
 
     class InputStream {
         constructor(buf: Buffer, withType: boolean);
         readObject(): any;
     }
-    export {InputStream as InputObjectStream};
+
+    class OutputStream {
+        constructor();
+        writeObject(obj: object): Buffer;
+    }
+
+    export {
+        InputStream as InputObjectStream,
+        OutputStream as OutputObjectStream
+    };
 }

@@ -1,7 +1,10 @@
 import {A3sDirectory} from './a3sDirectory';
+import {readFileSync} from 'fs';
+
+const a3sExamplesDir = __dirname + '/../resources/test/a3s';
 
 test('getting events from example file', (done) => {
-    const access = new A3sDirectory(__dirname + '/../resources/test/a3s');
+    const access = new A3sDirectory(a3sExamplesDir);
     access.getEvents().then(events => {
         expect(events).toHaveProperty('list');
         expect(events.list.length).toBeGreaterThan(0);
@@ -11,8 +14,15 @@ test('getting events from example file', (done) => {
         done();
     });
 });
-/*
-test('aaand saving events will produce the same file again', () => {
-    A3sEvents
-})
-*/
+
+test('aaand saving events will produce the same file again', (done) => {
+    const access = new A3sDirectory('/tmp');
+    const expectedFile = readFileSync(a3sExamplesDir + '/events');
+    const expectedSize = expectedFile.length;
+    access.setEvents({list: []}).then(() => {
+        const actualFile = readFileSync('/tmp/events');
+        expect(actualFile.length).toEqual(expectedSize);
+        done();
+    })
+});
+

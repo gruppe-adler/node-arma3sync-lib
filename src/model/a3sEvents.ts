@@ -7,3 +7,7 @@ export interface A3sEvent {
     addonNames: Map<string, boolean>
     userConfigFolderNames: Map<string, boolean>
 }
+
+export function a3sEventToJava(a3sEvent: A3sEvent): object {
+    return {};
+}
