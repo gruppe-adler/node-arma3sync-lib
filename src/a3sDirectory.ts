@@ -6,7 +6,7 @@ import {A3SSyncTree} from 'src/model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
-import {A3sEventsDto} from 'src/model/a3sEventsDto';
+import {A3sEvents, A3sEventsDto, AsJava} from 'src/model/a3sEventsDto';
 import {InputObjectStream, OutputObjectStream, normalize} from 'java.io';
 
 export class A3sDirectory implements A3sAccess {
@@ -25,7 +25,7 @@ export class A3sDirectory implements A3sAccess {
     }
 
     public setEvents(events: A3sEventsDto): Promise<void> {
-        return this.setFile(A3SFiles.EVENTS, events);
+        return this.setFile(A3SFiles.EVENTS, new A3sEvents(events));
     }
 
     public getRepository(): Promise<A3SAutoconfig> {
@@ -53,10 +53,10 @@ export class A3sDirectory implements A3sAccess {
             .then((unzippedBuffer: Buffer) => Promise.resolve(new InputObjectStream(unzippedBuffer, false).readObject()));
     }
 
-    private setFile(name: string, contents: object): Promise<void> {
+    private setFile(name: string, contents: AsJava): Promise<void> {
         const path = this.directory + '/' + name;
         const objectStream = new OutputObjectStream();
-        let foo = normalize(contents);
+        let foo = contents.asJava();
         return Promise
             .resolve(new OutputObjectStream().writeObject(foo))
             .then(buffer => promisify(gzip)(buffer))

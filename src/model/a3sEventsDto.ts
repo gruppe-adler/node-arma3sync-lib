@@ -1,4 +1,3 @@
-import {expand} from 'src/javaUtil';
 import {JObject, normalize} from 'java.io';
 
 export interface A3sEventsDto {
@@ -8,8 +7,8 @@ export interface A3sEventsDto {
 export interface A3sEventDto {
     name: string
     description: string
-    addonNames: { [addonName: string]: false }
-    userconfigFolderNames: { [folderName: string]: false }
+    addonNames: { [addonName: string]: boolean }
+    userconfigFolderNames: { [folderName: string]: boolean }
 }
 
 export interface AsJava {
@@ -52,7 +51,6 @@ export class HashMap<T> implements AsJava {
             }
         };
     }
-
 }
 
 export class ArrayList<T> implements AsJava {
@@ -80,37 +78,49 @@ export class ArrayList<T> implements AsJava {
     }
 }
 
-export class A3sEvents implements A3sEventsDto, AsJava {
+export class A3sEvents implements AsJava {
     constructor(
-        public list: A3SEvent[],
+        private dto: A3sEventsDto,
     ) {
     }
 
     asJava(): JObject<A3sEventsDto> {
-        const jA3sEventsList = this.list.map(event => new A3SEvent(event.name, event.description, event.addonNames, event.userconfigFolderNames).asJava());
-        const jA3sEvents = expand(this, 'fr.soe.a3s.domain.repository.Events');
+        const jA3sEventsList = this.dto.list.map(event => new A3SEvent(event).asJava());
+        const jA3sEvents = {
+            $: {
+                list: null,
+            },
+            $class: {
+                flags: 2,
+                serialVersionUID: '-5141643688299352462',
+                fields: [{
+                    'classname': 'Ljava/util/List;',
+                    'name': 'list',
+                    'type': 'L'
+                }],
+                name: 'fr.soe.a3s.domain.repository.Events',
+                superClass: null
+            }
+        };
         jA3sEvents.$.list = new ArrayList(jA3sEventsList).asJava();
 
         return jA3sEvents;
     }
 }
 
-export class A3SEvent implements A3sEventDto, AsJava {
+export class A3SEvent implements AsJava {
     constructor(
-        public name: string,
-        public description: string,
-        public addonNames: { [p: string]: false },
-        public userconfigFolderNames: { [p: string]: false },
+        private dto: A3sEventDto
     ) {
     }
 
     public asJava(): JObject<A3sEventsDto> {
         return {
             $: {
-                addonNames: new HashMap(this.addonNames, (v) => normalize(v, 'boolean')).asJava(),
-                description: normalize(this.description),
-                name: normalize(this.name),
-                userconfigFolderNames: new HashMap(this.userconfigFolderNames, (v) => normalize(v, 'boolean')).asJava()
+                addonNames: new HashMap(this.dto.addonNames, (v) => normalize(v, 'boolean')).asJava(),
+                description: normalize(this.dto.description),
+                name: normalize(this.dto.name),
+                userconfigFolderNames: new HashMap(this.dto.userconfigFolderNames, (v) => normalize(v, 'boolean')).asJava()
             },
             $class: {
                 'fields': [{

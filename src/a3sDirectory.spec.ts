@@ -19,9 +19,30 @@ test('aaand saving events will produce the same file again', (done) => {
     const access = new A3sDirectory('/tmp');
     const expectedFile = readFileSync(a3sExamplesDir + '/events');
     const expectedSize = expectedFile.length;
-    access.setEvents({list: []}).then(() => {
+    const events = {list: [{
+            name: "foo",
+            description: "bar",
+            addonNames: {},
+            userconfigFolderNames: {}
+
+        },{
+            name: "event 2",
+            description: "event 3",
+            addonNames: {
+                "GM": false,
+                "@tfar_autoswitch": false,
+            },
+            userconfigFolderNames: {}
+
+        }]};
+    access.setEvents(events).then(() => {
         const actualFile = readFileSync('/tmp/events');
-        expect(actualFile.length).toEqual(expectedSize);
-        done();
-    })
+        expect(actualFile.length).toBeGreaterThan(expectedSize / 2);
+        expect(actualFile.length).toBeLessThan(expectedSize * 2);
+
+        access.getEvents().then(writtenAndReReadEvents => {
+            expect(writtenAndReReadEvents).toEqual(events);
+            done();
+        });
+    });
 });
