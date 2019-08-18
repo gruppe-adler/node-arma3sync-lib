@@ -6,7 +6,7 @@ import {A3SSyncTree} from 'src/model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
-import {A3sEvents} from 'src/model/a3sEvents';
+import {A3sEventsDto} from 'src/model/a3sEventsDto';
 import {InputObjectStream, OutputObjectStream, normalize} from 'java.io';
 
 export class A3sDirectory implements A3sAccess {
@@ -18,13 +18,13 @@ export class A3sDirectory implements A3sAccess {
             .then(json => Promise.resolve(json as A3SChangelog));
     }
 
-    public getEvents(): Promise<A3sEvents> {
+    public getEvents(): Promise<A3sEventsDto> {
         return this
             .getFile(A3SFiles.EVENTS)
-            .then(json => Promise.resolve(json as A3sEvents));
+            .then(json => Promise.resolve(json as A3sEventsDto));
     }
 
-    public setEvents(events: A3sEvents): Promise<void> {
+    public setEvents(events: A3sEventsDto): Promise<void> {
         return this.setFile(A3SFiles.EVENTS, events);
     }
 
