@@ -6,8 +6,8 @@ import {A3SSyncTree} from 'src/model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
-import {A3sEvents, A3sEventsDto, AsJava} from 'src/model/a3sEventsDto';
-import {InputObjectStream, OutputObjectStream, normalize} from 'java.io';
+import {A3sEvents, A3sEventsDto, AsJava} from './model/a3sEventsDto';
+import {InputObjectStream, OutputObjectStream} from 'java.io';
 
 export class A3sDirectory implements A3sAccess {
     constructor(private directory: string)  {}
