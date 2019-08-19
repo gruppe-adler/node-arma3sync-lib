@@ -1,2 +1,6 @@
 tsconfig.json
 src
+.idea
+.git
+resources/test
+
