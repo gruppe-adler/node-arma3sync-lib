@@ -1,8 +1,8 @@
-import {A3sAccess, A3SFiles} from 'src/a3sAccess';
-import {A3SChangelog} from 'src/model/a3sChangelog';
-import {A3SAutoconfig} from 'src/model/a3SAutoconfig';
-import {A3SServerInfo} from 'src/model/a3sServerInfo';
-import {A3SSyncTree} from 'src/model/a3sSync';
+import {A3sAccess, A3SFiles} from './a3sAccess';
+import {A3SChangelog} from './model/a3sChangelog';
+import {A3SAutoconfig} from './model/a3SAutoconfig';
+import {A3SServerInfo} from './model/a3sServerInfo';
+import {A3SSyncTree} from './model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';

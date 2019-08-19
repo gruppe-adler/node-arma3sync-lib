@@ -1,4 +1,4 @@
-import {A3sEvents} from 'src/model/a3sEventsDto';
+import {A3sEvents} from './a3sEventsDto';
 
 test('serialize event', () => {
     const jEvents = new A3sEvents({
