@@ -1,6 +1,5 @@
 export interface A3sSyncTreeDirectory extends A3sSyncTreeNode {
     list: A3sSyncTreeLeaf[]|A3sSyncTreeDirectory[]
-    parent: A3sSyncTreeDirectory|null
 }
 
 export interface A3sSyncTreeNode {
@@ -9,6 +8,7 @@ export interface A3sSyncTreeNode {
     markAsAddon: boolean
     name: string
     updated: boolean
+    parent?: A3sSyncTreeDirectory|null // a3s serialized files always contain the property. keep it optional for input.
 }
 
 export interface A3sSyncTreeLeaf extends A3sSyncTreeNode {
