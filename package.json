@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
-    "build": "jest && node_modules/.bin/tsc"
+    "build": "jest && node_modules/.bin/tsc && cp -r src/@types dist/"
   },
   "dependencies": {
     "@types/node": "^12.7.2",
