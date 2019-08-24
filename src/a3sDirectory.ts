@@ -2,7 +2,7 @@ import {A3sAccess, A3SFiles} from './a3sAccess';
 import {A3SChangelog} from './model/a3sChangelog';
 import {A3SAutoconfig} from './model/a3SAutoconfig';
 import {A3SServerInfo} from './model/a3sServerInfo';
-import {A3SSyncTree} from './model/a3sSync';
+import {A3sSyncTreeDirectory} from './model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
@@ -40,10 +40,10 @@ export class A3sDirectory implements A3sAccess {
             .then(json => Promise.resolve(json as A3SServerInfo));
     }
 
-    public getSync(): Promise<A3SSyncTree> {
+    public getSync(): Promise<A3sSyncTreeDirectory> {
         return this
             .getFile(A3SFiles.SYNC)
-            .then(json => Promise.resolve(json as A3SSyncTree));
+            .then(json => Promise.resolve(json as A3sSyncTreeDirectory));
     }
 
     private getFile(name: string): Promise<object> {
@@ -55,7 +55,6 @@ export class A3sDirectory implements A3sAccess {
 
     private setFile(name: string, contents: AsJava): Promise<void> {
         const path = this.directory + '/' + name;
-        const objectStream = new OutputObjectStream();
         let foo = contents.asJava();
         return Promise
             .resolve(new OutputObjectStream().writeObject(foo))
