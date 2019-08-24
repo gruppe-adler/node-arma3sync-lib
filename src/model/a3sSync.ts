@@ -1,21 +1,19 @@
-export interface A3SSyncTree {
-    name: string;
-    destinationPath: string;
-    updated: boolean;
-    deleted: boolean;
-    parent?: A3SSyncTree;
-    list?: A3SSyncTree[];
+export interface A3sSyncTreeDirectory extends A3sSyncTreeNode {
+    list: A3sSyncTreeLeaf[]|A3sSyncTreeNode[]
+    parent: A3sSyncTreeDirectory|null
 }
 
-export interface A3SSyncTreeNode extends A3SSyncTree {
-    markAsAddon: boolean,
+export interface A3sSyncTreeNode {
+    deleted: boolean
     hidden: boolean
+    markAsAddon: boolean
+    name: string
+    updated: boolean
 }
 
-export interface A3SSyncTreeLeaf extends A3SSyncTree {
-        sha1: string,
-        compressedSize: number, // long
-        complete: number, // long
-        localSha1: string,
-        compressed: boolean,
+export interface A3sSyncTreeLeaf extends A3sSyncTreeNode {
+    compressed: boolean
+    compressedSize: number // long
+    size: number
+    sha1: string
 }
