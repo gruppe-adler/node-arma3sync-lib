@@ -1,5 +1,5 @@
 export interface A3sSyncTreeDirectory extends A3sSyncTreeNode {
-    list: A3sSyncTreeLeaf[]|A3sSyncTreeNode[]
+    list: A3sSyncTreeLeaf[]|A3sSyncTreeDirectory[]
     parent: A3sSyncTreeDirectory|null
 }
 
