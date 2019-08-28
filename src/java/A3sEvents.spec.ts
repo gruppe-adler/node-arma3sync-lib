@@ -1,7 +1,7 @@
-import {A3sEvents} from './a3sEventsDto';
+import {serializeA3sEvents} from './A3sEvents';
 
 test('serialize event', () => {
-    const jEvents = new A3sEvents({
+    const jEvents = serializeA3sEvents({
         list: [
             {
                 name: 'foo',
@@ -21,7 +21,7 @@ test('serialize event', () => {
         ]
     });
 
-    expect(jEvents.asJava()).toEqual({
+    expect(jEvents).toEqual({
         '$': {
             'list': {
                 '$': {

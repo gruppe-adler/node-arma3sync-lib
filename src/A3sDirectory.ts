@@ -2,12 +2,15 @@ import {A3sAccess, A3SFiles} from './a3sAccess';
 import {A3SChangelog} from './model/a3sChangelog';
 import {A3SAutoconfig} from './model/a3SAutoconfig';
 import {A3SServerInfo} from './model/a3sServerInfo';
-import {A3sSyncTreeDirectory} from './model/a3sSync';
+import {A3sSyncTreeDirectoryDto} from './model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
-import {A3sEvents, A3sEventsDto, AsJava} from './model/a3sEventsDto';
+import {A3sEventsDto} from './model/a3sEventsDto';
 import {InputObjectStream, OutputObjectStream} from 'java.io';
+import {serializeA3sEvents} from './java/A3sEvents';
+import {serializeA3sSyncTreeDirectory} from './java/A3sSyncTreeDirectory';
+import {GenericJObject} from './java/serializer/interfaces';
 
 export class A3sDirectory implements A3sAccess {
     constructor(private directory: string)  {}
@@ -25,7 +28,7 @@ export class A3sDirectory implements A3sAccess {
     }
 
     public setEvents(events: A3sEventsDto): Promise<void> {
-        return this.setFile(A3SFiles.EVENTS, new A3sEvents(events));
+        return this.setFile(A3SFiles.EVENTS, serializeA3sEvents(events));
     }
 
     public getRepository(): Promise<A3SAutoconfig> {
@@ -40,10 +43,14 @@ export class A3sDirectory implements A3sAccess {
             .then(json => Promise.resolve(json as A3SServerInfo));
     }
 
-    public getSync(): Promise<A3sSyncTreeDirectory> {
+    public getSync(): Promise<A3sSyncTreeDirectoryDto> {
         return this
             .getFile(A3SFiles.SYNC)
-            .then(json => Promise.resolve(json as A3sSyncTreeDirectory));
+            .then(json => Promise.resolve(json as A3sSyncTreeDirectoryDto));
+    }
+
+    public setSync(sync: A3sSyncTreeDirectoryDto): Promise<void> {
+        return this.setFile(A3SFiles.SYNC, serializeA3sSyncTreeDirectory(sync));
     }
 
     private getFile(name: string): Promise<object> {
@@ -53,11 +60,10 @@ export class A3sDirectory implements A3sAccess {
             .then((unzippedBuffer: Buffer) => Promise.resolve(new InputObjectStream(unzippedBuffer, false).readObject()));
     }
 
-    private setFile(name: string, contents: AsJava): Promise<void> {
+    private setFile(name: string, contents: GenericJObject): Promise<void> {
         const path = this.directory + '/' + name;
-        let foo = contents.asJava();
         return Promise
-            .resolve(new OutputObjectStream().writeObject(foo))
+            .resolve(new OutputObjectStream().writeObject(contents))
             .then(buffer => promisify(gzip)(buffer))
             .then(rawFile => promisify(writeFile)(path, rawFile))
     }

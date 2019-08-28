@@ -1,19 +1,28 @@
-export interface A3sSyncTreeDirectory extends A3sSyncTreeNode {
-    list: (A3sSyncTreeLeaf|A3sSyncTreeDirectory)[]
+import {Child} from './child';
+
+export function stripCircularReferences(obj: {parent?: object, list?: any[]}): void {
+    delete obj.parent;
+    if (obj.list) {
+        obj.list.forEach(stripCircularReferences)
+    }
 }
 
-export interface A3sSyncTreeNode {
-    deleted: boolean
+export interface A3sSyncTreeDirectoryDto extends A3sSyncTreeNodeDto {
+    list: (A3sSyncTreeLeafDto|A3sSyncTreeDirectoryDto)[]
     hidden: boolean
     markAsAddon: boolean
-    name: string
-    updated: boolean
-    parent?: A3sSyncTreeDirectory|null // a3s serialized files always contain the property. keep it optional for input.
 }
 
-export interface A3sSyncTreeLeaf extends A3sSyncTreeNode {
+export interface A3sSyncTreeNodeDto extends Child<A3sSyncTreeDirectoryDto> {
+    deleted: boolean
+    name: string
+    updated: boolean
+    parent?: A3sSyncTreeDirectoryDto|null // a3s serialized files always contain the property. keep it optional for input.
+}
+
+export interface A3sSyncTreeLeafDto extends A3sSyncTreeNodeDto {
     compressed: boolean
-    compressedSize: number // long
+    compressedSize: number
     size: number
     sha1: string
 }
