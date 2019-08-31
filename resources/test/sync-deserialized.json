@@ -1,0 +1,45 @@
+{
+  "deleted": false,
+  "hidden": false,
+  "list": [
+    {
+      "deleted": false,
+      "hidden": false,
+      "list": [
+        {
+          "deleted": false,
+          "hidden": false,
+          "list": [
+            {
+              "compressed": false,
+              "compressedSize": 0,
+              "deleted": false,
+              "name": "tfar_autoswitch.pbo",
+              "sha1": "ee33a9355460a034896ba06a545fdae14e54c70f",
+              "size": 2144,
+              "updated": false
+            }
+          ],
+          "markAsAddon": false,
+          "name": "addons",
+          "updated": false
+        },
+        {
+          "compressed": false,
+          "compressedSize": 0,
+          "deleted": false,
+          "name": "mod.cpp",
+          "sha1": "fbfdc8d4006332b93c0a1bc913f96346919ea576",
+          "size": 192,
+          "updated": false
+        }
+      ],
+      "markAsAddon": true,
+      "name": "@tfar_autoswitch",
+      "updated": false
+    }
+  ],
+  "markAsAddon": false,
+  "name": "racine",
+  "updated": false
+}

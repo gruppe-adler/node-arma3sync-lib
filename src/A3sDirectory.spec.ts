@@ -2,7 +2,8 @@ import {readFileSync} from 'fs';
 import {A3sSyncTreeDirectoryDto, stripCircularReferences} from './model/a3sSync';
 import {A3sDirectory} from './A3sDirectory';
 
-const a3sExamplesDir = __dirname + '/../resources/test/a3s';
+const a3sExamplesDir = __dirname + '/../resources/test/repo/.a3s';
+const testSyncJsonFile = __dirname + '/../resources/test/sync-deserialized.json';
 
 Error.stackTraceLimit = 50; // TODO
 
@@ -17,50 +18,7 @@ function addParents(obj) {
 }
 
 function getExampleSync(withParent: boolean = false): A3sSyncTreeDirectoryDto {
-    const exampleSync = {
-        'deleted': false,
-        'hidden': false,
-        'list': [{
-            'deleted': false,
-            'hidden': false,
-            'list': [
-                {
-                    'deleted': false,
-                    'hidden': false,
-                    'list': [
-                        {
-                            'compressed': false,
-                            'compressedSize': 0,
-                            'deleted': false,
-                            'name': 'tfar_autoswitch.pbo',
-                            'sha1': 'ee33a9355460a034896ba06a545fdae14e54c70f',
-                            'size': 2144,
-                            'updated': false,
-                        },
-                    ],
-                    'markAsAddon': false,
-                    'name': 'addons',
-                    'updated': false,
-                },
-                {
-                    'compressed': false,
-                    'compressedSize': 0,
-                    'deleted': false,
-                    'name': 'mod.cpp',
-                    'sha1': 'fbfdc8d4006332b93c0a1bc913f96346919ea576',
-                    'size': 192,
-                    'updated': false,
-                },
-            ],
-            'markAsAddon': true,
-            'name': '@tfar_autoswitch',
-            'updated': false,
-        },
-        ],
-        'markAsAddon': false,
-        'name': 'racine',
-        'updated': false,
-    };
+    const exampleSync = JSON.parse(readFileSync(testSyncJsonFile).toString());
     if (withParent) {
         addParents(exampleSync);
     }
