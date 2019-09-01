@@ -1,6 +1,6 @@
 import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../model/a3sSync';
 import * as crypto from 'crypto'
-import {Dirent, readdir, readFile, stat} from 'fs'
+import {createReadStream, Dirent, readdir, readFile, stat} from 'fs'
 import {promisify} from 'util';
 
 export class SyncGenerationService {
@@ -21,12 +21,13 @@ export class SyncGenerationService {
                 }
                 resolve(hashingResult.toString('hex'));
             });
-            promisify(readFile)(file)
-                .then((data) => {
-                    hash.write(data);
-                    hash.end();
-                })
-                .catch(reject);
+            const fStream = createReadStream(file);
+            fStream.on('data', (data) => {
+                hash.update(data);
+            });
+            fStream.on('end', () => {
+                hash.end();
+            });
         });
     }
 
