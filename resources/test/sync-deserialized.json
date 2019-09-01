@@ -28,6 +28,15 @@
           "compressed": false,
           "compressedSize": 0,
           "deleted": false,
+          "name": "emptyFile.md",
+          "sha1": "0",
+          "size": 0,
+          "updated": false
+        },
+        {
+          "compressed": false,
+          "compressedSize": 0,
+          "deleted": false,
           "name": "mod.cpp",
           "sha1": "fbfdc8d4006332b93c0a1bc913f96346919ea576",
           "size": 192,

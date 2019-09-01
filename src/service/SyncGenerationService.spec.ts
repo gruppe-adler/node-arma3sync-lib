@@ -43,6 +43,15 @@ describe(SyncGenerationService.name, () => {
             const sync = await generatingSync;
             expect(sync).toEqual(exampleSync);
             done();
+        });
+        it('declares an empty file to have a sha1 of "0" (yes thats how Arma3Sync does it)', async (done) => {
+            const sync = await generatingSync;
+            const tfar: A3sSyncTreeDirectoryDto = sync.list.find(dir => dir.name === '@tfar_autoswitch') as A3sSyncTreeDirectoryDto;
+            const emptyFile: A3sSyncTreeLeafDto = tfar.list.find(file => file.name === 'emptyFile.md') as A3sSyncTreeLeafDto;
+
+            expect(emptyFile.size).toBe(0);
+            expect(emptyFile.sha1).toBe("0");
+            done();
         })
     });
 });

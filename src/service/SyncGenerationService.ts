@@ -19,7 +19,9 @@ export class SyncGenerationService {
                 if (!hashingResult) {
                     return;
                 }
-                resolve(hashingResult.toString('hex'));
+                const hashString = hashingResult.toString('hex');
+                // thats the hash for an empty file, apparently
+                resolve(hashString === 'da39a3ee5e6b4b0d3255bfef95601890afd80709' ? '0' : hashString);
             });
             const fStream = createReadStream(file);
             fStream.on('data', (data) => {
