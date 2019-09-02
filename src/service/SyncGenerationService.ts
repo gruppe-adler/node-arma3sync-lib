@@ -1,14 +1,26 @@
 import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../model/a3sSync';
 import * as crypto from 'crypto'
-import {createReadStream, Dirent, readdir, readFile, stat} from 'fs'
+import {createReadStream, Dirent, readdir, stat} from 'fs'
 import {promisify} from 'util';
+import {Path} from '../util/aliases';
+
+function checkPath(subDir: Path) {
+    if (!subDir.startsWith('/')) {
+        throw new Error('subdir needs to be absolute on repo path – and start with "/"!');
+    }
+}
 
 export class SyncGenerationService {
-    constructor(private path: string) {
+    constructor(private repoPath: string) {
     }
 
     public generateSync(): Promise<A3sSyncTreeDirectoryDto> {
-        return this.walk(this.path);
+        return this.walk(this.repoPath);
+    }
+
+    public generatePartialSync(subDir: Path): Promise<A3sSyncTreeDirectoryDto> {
+        checkPath(subDir);
+        return this.walk(this.repoPath + subDir);
     }
 
     private hash(file: string): Promise<string> {
@@ -34,7 +46,7 @@ export class SyncGenerationService {
     }
 
     private async walk(currentPath: string): Promise<A3sSyncTreeDirectoryDto> {
-        const subPath = currentPath.slice(this.path.length);
+        const subPath = currentPath.slice(this.repoPath.length);
         const name = subPath.split('/').pop() || 'racine';
         const tree: A3sSyncTreeDirectoryDto = {
             deleted: false,

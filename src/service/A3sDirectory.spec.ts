@@ -1,9 +1,11 @@
 import {readFileSync} from 'fs';
-import {A3sSyncTreeDirectoryDto, stripCircularReferences} from './model/a3sSync';
+import {A3sSyncTreeDirectoryDto, stripCircularReferences} from '../model/a3sSync';
 import {A3sDirectory} from './A3sDirectory';
+import {A3sEventsDto} from '../model/a3sEventsDto';
 
-const a3sExamplesDir = __dirname + '/../resources/test/repo/.a3s';
-const testSyncJsonFile = __dirname + '/../resources/test/sync-deserialized.json';
+const a3sExamplesDir = __dirname + '/../../resources/test/repo/.a3s';
+const testSyncJsonFile = __dirname + '/../../resources/test/sync-deserialized.json';
+const testEventsJsonFile = __dirname + '/../../resources/test/events-deserialized.json';
 
 Error.stackTraceLimit = 50; // TODO
 
@@ -25,6 +27,10 @@ function getExampleSync(withParent: boolean = false): A3sSyncTreeDirectoryDto {
     return exampleSync
 }
 
+function getExampleEvents(): A3sEventsDto {
+    return JSON.parse(readFileSync(testEventsJsonFile).toString());
+}
+
 describe(A3sDirectory.name, () => {
     const examplesDirectory = new A3sDirectory(a3sExamplesDir);
     describe('setEvents', () => {
@@ -32,24 +38,7 @@ describe(A3sDirectory.name, () => {
             const access = new A3sDirectory('/tmp');
             const expectedFile = readFileSync(a3sExamplesDir + '/events');
             const expectedSize = expectedFile.length;
-            const events = {
-                list: [{
-                    name: 'foo',
-                    description: 'bar',
-                    addonNames: {},
-                    userconfigFolderNames: {}
-
-                }, {
-                    name: 'event 2',
-                    description: 'event 3',
-                    addonNames: {
-                        'GM': false,
-                        '@tfar_autoswitch': false,
-                    },
-                    userconfigFolderNames: {}
-
-                }]
-            };
+            const events: A3sEventsDto = getExampleEvents();
             access.setEvents(events).then(() => {
                 const actualFile = readFileSync('/tmp/events');
                 expect(actualFile.length).toBeGreaterThan(expectedSize / 2);

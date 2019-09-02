@@ -1,0 +1,18 @@
+{
+  "list": [{
+    "name": "foo",
+    "description": "bar",
+    "addonNames": {},
+    "userconfigFolderNames": {}
+
+  }, {
+    "name": "event 2",
+    "description": "event 3",
+    "addonNames": {
+      "GM": false,
+      "@tfar_autoswitch": false
+    },
+    "userconfigFolderNames": {}
+
+  }]
+}

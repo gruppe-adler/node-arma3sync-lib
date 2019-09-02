@@ -1,7 +1,12 @@
 import {exec} from 'child_process';
 import {promisify} from 'util';
+import {Path} from '../util/aliases';
+import {TODO} from '../util/funcs';
+import {readdir, unlink} from 'fs';
 
-type Path = string;
+function sum(numbers: number[]): number {
+    return numbers.reduce((a, b) => a + b, 0)
+}
 
 /**
  * because we don't have a working zsync implementation in the JS world,
@@ -15,7 +20,10 @@ export class ZSyncGenerationService {
         private customSpawn: Function = null,
     ) {}
 
-    public async generateZsyncs(file: Path): Promise<void> {
+    /**
+     * create-overwrite a single zsync file
+     */
+    public async writeSingle(file: Path): Promise<void> {
         ZSyncGenerationService.checkPath(file);
 
         const cmdLine = this.getCmdLine(file);
@@ -29,6 +37,32 @@ export class ZSyncGenerationService {
             console.warn('OUT ' + result.stdout.toString());
             console.warn('ERR ' + result.stderr.toString());
         }
+    }
+
+    /**
+     * removes all zsync files from path
+     * returns number of deleted files
+     */
+    public async clear(path: Path): Promise<number> {
+        const entries = await promisify(readdir)(path, {withFileTypes: true});
+        const zsyncs: string[] = entries.filter(dirent => dirent.isFile() && dirent.name.endsWith('.zsync')).map(dirent => dirent.name);
+        const subdirs: string[] = entries.filter(dirent => dirent.isDirectory() && dirent.name !== '.' && dirent.name !== '..').map(dirent => dirent.name);
+        const recursingPromises: number[] = await Promise.all(subdirs.map(subdir => {
+            return this.clear(`${path}/${subdir}`);
+        }));
+        await Promise.all(zsyncs.map(zsync => {
+            return promisify(unlink)(`${path}/${zsync}`);
+        }));
+
+        return Promise.resolve(zsyncs.length + sum(recursingPromises));
+    }
+
+    /**
+     * update all zsyncs if they're older than the files they refer to,
+     * or create if not existent
+     */
+    public async update(path: Path): Promise<void> {
+        return Promise.reject(TODO());
     }
 
     private static checkPath(file: Path) {

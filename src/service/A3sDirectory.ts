@@ -1,19 +1,20 @@
 import {A3sAccess, A3SFiles} from './a3sAccess';
-import {A3SChangelog} from './model/a3sChangelog';
-import {A3SAutoconfig} from './model/a3SAutoconfig';
-import {A3SServerInfo} from './model/a3sServerInfo';
-import {A3sSyncTreeDirectoryDto} from './model/a3sSync';
+import {A3SChangelog} from '../model/a3sChangelog';
+import {A3SAutoconfig} from '../model/a3SAutoconfig';
+import {A3SServerInfo} from '../model/a3sServerInfo';
+import {A3sSyncTreeDirectoryDto} from '../model/a3sSync';
 import {readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
-import {A3sEventsDto} from './model/a3sEventsDto';
+import {A3sEventsDto} from '../model/a3sEventsDto';
 import {InputObjectStream, OutputObjectStream} from 'java.io';
-import {serializeA3sEvents} from './java/A3sEvents';
-import {serializeA3sSyncTreeDirectory} from './java/A3sSyncTreeDirectory';
-import {GenericJObject} from './java/serializer/interfaces';
+import {serializeA3sEvents} from '../java/A3sEvents';
+import {serializeA3sSyncTreeDirectory} from '../java/A3sSyncTreeDirectory';
+import {GenericJObject} from '../java/serializer/interfaces';
+import {Path} from '../util/aliases';
 
 export class A3sDirectory implements A3sAccess {
-    constructor(private directory: string)  {}
+    constructor(private directory: Path)  {}
 
     public getChangelogs(): Promise<A3SChangelog> {
         return this
