@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+fs = require('fs');
+
 function formatAllMemories(mem) {
     const M = 1024*1024;
     const ext = (mem.external / M).toFixed(1);
@@ -13,6 +17,10 @@ let SyncGenerator = require(__dirname + '/../dist/service/SyncGenerationService.
 let dir = process.argv.pop();
 if (!dir) {
     console.error('missing directory argument');
+    process.exit(1);
+}
+if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
+    console.error(dir + ' is no directory');
     process.exit(1);
 }
 

@@ -1,0 +1,6 @@
+{
+  "arma3sync-lib": {
+    "publicURL": "http://foo",
+    "repoPath": "/var/lib/repo"
+  }
+}

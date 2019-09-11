@@ -10,7 +10,7 @@ declare module 'java.io' {
         serialVersionUID: string
         fields: {classname?: string, name: keyof T, type: string}[]
         name: string
-        superClass: null // ?
+        superClass: null|JClass<any>
     }
 
     export interface JObject<T> {

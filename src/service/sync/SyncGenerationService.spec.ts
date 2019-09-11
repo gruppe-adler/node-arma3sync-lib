@@ -1,9 +1,9 @@
 import {SyncGenerationService} from './SyncGenerationService';
-import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../model/a3sSync';
+import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../../model/a3sSync';
 import {readFileSync} from "fs";
 
-const a3sExampleModsDir = __dirname + '/../../resources/test/repo';
-const testSyncJsonFile = __dirname + '/../../resources/test/sync-deserialized.json';
+const a3sExampleModsDir = __dirname + '/../../../resources/test/repo';
+const testSyncJsonFile = __dirname + '/../../../resources/test/sync-deserialized.json';
 const exampleSync = JSON.parse(readFileSync(testSyncJsonFile).toString());
 
 describe(SyncGenerationService.name, () => {

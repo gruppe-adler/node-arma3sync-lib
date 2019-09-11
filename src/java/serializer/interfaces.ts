@@ -31,13 +31,13 @@ export interface JClass<T> {
     serialVersionUID: string
     fields: IFieldDeclaration<T>[]
     name: string
-    superClass: null // ?
+    superClass: null|JClass<any>
 }
 
 export interface NormalJObject<T> {
     $: IFieldDefinitions<T>
     $class: JClass<T>
-    _$?: object
+    _$?: object|string
 }
 
 export interface GenericJObject extends NormalJObject<any> {}

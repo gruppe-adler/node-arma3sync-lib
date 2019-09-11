@@ -1,6 +1,6 @@
 import {A3sSyncTreeLeafDto} from '../model/a3sSync';
-import {GenericJObject} from '../java/serializer/interfaces';
-import {bool, classField, java, long} from '../java/serializer/util/field-declarations';
+import {GenericJObject} from './serializer/interfaces';
+import {bool, classField, java, long} from './serializer/util/field-declarations';
 
 export const serializeA3sSyncTreeLeaf = function(dto: A3sSyncTreeLeafDto, serializedParent: GenericJObject): GenericJObject {
     const parentClassname = "fr.soe.a3s.domain.repository.SyncTreeDirectory";

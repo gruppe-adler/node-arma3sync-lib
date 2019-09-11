@@ -1,13 +1,25 @@
 import {readFileSync} from 'fs';
 import {A3sSyncTreeDirectoryDto, stripCircularReferences} from '../model/a3sSync';
 import {A3sDirectory} from './A3sDirectory';
-import {A3sEventsDto} from '../model/a3sEventsDto';
+import {A3sEventsDto} from '../model/A3sEventsDto';
+import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
+import {A3sChangelogs} from '../model/A3sChangelogs';
+import {A3sAutoconfigDto} from '../dto/A3sAutoconfigDto';
+import {util} from 'config';
+
+util.setModuleDefaults("arma3sync-lib", {
+    repoPath: '/var/lib/repo',
+    publicURL: 'http://foo'
+});
 
 const a3sExamplesDir = __dirname + '/../../resources/test/repo/.a3s';
 const testSyncJsonFile = __dirname + '/../../resources/test/sync-deserialized.json';
 const testEventsJsonFile = __dirname + '/../../resources/test/events-deserialized.json';
+const testServerInfoJsonFile = __dirname + '/../../resources/test/serverinfo-deserialized.json';
+const testChangelogJsonFile = __dirname + '/../../resources/test/changelog-deserialized.json';
+const testAutoconfigJsonFile = __dirname + '/../../resources/test/autoconfig-deserialized.json';
 
-Error.stackTraceLimit = 50; // TODO
+Error.stackTraceLimit = 50;
 
 function addParents(obj) {
     obj.parent = null;
@@ -30,6 +42,27 @@ function getExampleSync(withParent: boolean = false): A3sSyncTreeDirectoryDto {
 function getExampleEvents(): A3sEventsDto {
     return JSON.parse(readFileSync(testEventsJsonFile).toString());
 }
+
+function getExampleServerInfo(): A3sServerInfoDto {
+    const exampleServerInfo = JSON.parse(readFileSync(testServerInfoJsonFile).toString()) as A3sServerInfoDto;
+    exampleServerInfo.buildDate = new Date(exampleServerInfo.buildDate);
+
+    return exampleServerInfo;
+}
+
+function getExampleChangelogs(): A3sChangelogs {
+    const changelogs = JSON.parse(readFileSync(testChangelogJsonFile).toString()) as A3sChangelogs;
+    changelogs.list.forEach(changelog => {
+        changelog.buildDate = new Date(changelog.buildDate);
+    });
+
+    return changelogs;
+}
+
+function getExampleAutoconfig(): A3sAutoconfigDto {
+    return JSON.parse(readFileSync(testAutoconfigJsonFile).toString()) as A3sAutoconfigDto;
+}
+
 
 describe(A3sDirectory.name, () => {
     const examplesDirectory = new A3sDirectory(a3sExamplesDir);
@@ -85,6 +118,49 @@ describe(A3sDirectory.name, () => {
                     done();
                 });
             });
+        });
+    });
+
+    describe('getServerInfo', () => {
+        it('does shit', async (done) => {
+            const serverInfo = await examplesDirectory.getServerInfo();
+            expect(serverInfo).toEqual(getExampleServerInfo());
+
+            done();
+        });
+    });
+    describe('setServerInfo', () => {
+        it('does shit', async (done) => {
+            const access = new A3sDirectory('/tmp');
+            const serverInfo: A3sServerInfoDto = getExampleServerInfo();
+
+            await access.setServerInfo(serverInfo);
+            const reReadServerInfo = await access.getServerInfo();
+            expect(reReadServerInfo).toEqual(getExampleServerInfo());
+            done();
+        });
+    });
+
+    describe('setChangelogs', () => {
+        it('writes changelog entries', async (done) => {
+            const access = new A3sDirectory('/tmp');
+            const changelogs: A3sChangelogs = getExampleChangelogs();
+
+            await access.setChangelogs(changelogs);
+            const reReadChangelog = await access.getChangelogs();
+            expect(reReadChangelog).toEqual(getExampleChangelogs());
+            done();
+        });
+    });
+
+    describe('setAutoconfig', () => {
+        it('writes autoconfig', async (done) => {
+            const access = new A3sDirectory('/tmp');
+            const autoconfig = getExampleAutoconfig();
+            await access.setAutoconfig(autoconfig);
+            const reReadAutoconfig = await access.getAutoconfig();
+            expect(reReadAutoconfig).toEqual(getExampleAutoconfig());
+            done();
         });
     });
 });

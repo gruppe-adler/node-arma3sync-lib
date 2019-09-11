@@ -17,7 +17,7 @@ export interface A3sSyncTreeNodeDto extends Child<A3sSyncTreeDirectoryDto> {
     deleted: boolean
     name: string
     updated: boolean
-    parent?: A3sSyncTreeDirectoryDto|null // a3s serialized files always contain the property. keep it optional for input.
+    parent?: A3sSyncTreeDirectoryDto // a3s serialized files always contain the property. keep it optional for input.
 }
 
 export interface A3sSyncTreeLeafDto extends A3sSyncTreeNodeDto {

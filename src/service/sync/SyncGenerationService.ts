@@ -1,8 +1,9 @@
-import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../model/a3sSync';
+import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../../model/a3sSync';
 import * as crypto from 'crypto'
 import {createReadStream, Dirent, readdir, stat} from 'fs'
 import {promisify} from 'util';
-import {Path} from '../util/aliases';
+import {Path} from '../../util/aliases';
+import {getLogger} from '../../config';
 
 function checkPath(subDir: Path) {
     if (!subDir.startsWith('/')) {
@@ -61,7 +62,7 @@ export class SyncGenerationService {
         try {
             entries = await promisify(readdir)(currentPath, {withFileTypes: true});
         } catch (e) {
-            console.error(e.message);
+            getLogger().error(e.message);
             return Promise.reject(e);
         }
         const files = entries.filter((entry: Dirent) => entry.isFile() && !entry.name.endsWith('.zsync'));

@@ -1,0 +1,16 @@
+{
+  "favoriteServers": [],
+  "protocole": {
+    "connectionTimeOut": "300000",
+    "encryptionMode": null,
+    "login": "anonymous",
+    "password": "",
+    "port": "80",
+    "protocolType": {
+      "name": "HTTP"
+    },
+    "readTimeOut": "300000",
+    "url": "foo.bar/.a3s/autoconfig"
+  },
+  "repositoryName": "Foo"
+}

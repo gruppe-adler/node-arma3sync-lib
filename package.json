@@ -9,7 +9,9 @@
     "build": "jest && node_modules/.bin/tsc && cp -r src/@types dist/"
   },
   "dependencies": {
+    "@types/config": "0.0.34",
     "@types/node": "^12.7.2",
+    "config": "^3.2.2",
     "java.io": "^2.4.0"
   },
   "keywords": [],

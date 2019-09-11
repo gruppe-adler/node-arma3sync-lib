@@ -1,25 +1,39 @@
 import {A3sAccess, A3SFiles} from './a3sAccess';
-import {A3SChangelog} from '../model/a3sChangelog';
-import {A3SAutoconfig} from '../model/a3SAutoconfig';
-import {A3SServerInfo} from '../model/a3sServerInfo';
+import {A3sAutoconfigDto} from '../dto/A3sAutoconfigDto';
+import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
 import {A3sSyncTreeDirectoryDto} from '../model/a3sSync';
-import {readFile, writeFile} from 'fs';
+import {existsSync, mkdirSync, readFile, writeFile} from 'fs';
 import {promisify} from 'util';
 import {gunzip, gzip} from 'zlib';
-import {A3sEventsDto} from '../model/a3sEventsDto';
+import {A3sEventsDto} from '../model/A3sEventsDto';
 import {InputObjectStream, OutputObjectStream} from 'java.io';
 import {serializeA3sEvents} from '../java/A3sEvents';
 import {serializeA3sSyncTreeDirectory} from '../java/A3sSyncTreeDirectory';
 import {GenericJObject} from '../java/serializer/interfaces';
 import {Path} from '../util/aliases';
+import {serializeA3sServerInfo} from '../java/A3sServerInfo';
+import {A3sChangelogs} from '../model/A3sChangelogs';
+import {serializeA3sChangelogs} from '../java/A3sChangelogs';
+import {serializeA3sAutoconfig} from '../java/serializer/A3sAutoconfig';
 
+/**
+ * read and write the files in /.a3s : Provides type safety, but does not guarantee consistency across files.
+ */
 export class A3sDirectory implements A3sAccess {
-    constructor(private directory: Path)  {}
+    constructor(private a3sDirectory: Path)  {
+        if (!existsSync(a3sDirectory)) {
+            mkdirSync(a3sDirectory);
+        }
+    }
 
-    public getChangelogs(): Promise<A3SChangelog> {
+    public getChangelogs(): Promise<A3sChangelogs> {
         return this
             .getFile(A3SFiles.CHANGELOGS)
-            .then(json => Promise.resolve(json as A3SChangelog));
+            .then(json => Promise.resolve(json as A3sChangelogs));
+    }
+
+    public setChangelogs(changelogs: A3sChangelogs): Promise<void> {
+        return this.setFile(A3SFiles.CHANGELOGS, serializeA3sChangelogs(changelogs))
     }
 
     public getEvents(): Promise<A3sEventsDto> {
@@ -32,16 +46,24 @@ export class A3sDirectory implements A3sAccess {
         return this.setFile(A3SFiles.EVENTS, serializeA3sEvents(events));
     }
 
-    public getRepository(): Promise<A3SAutoconfig> {
+    public getAutoconfig(): Promise<A3sAutoconfigDto> {
         return this
             .getFile(A3SFiles.AUTOCONFIG)
-            .then(json => Promise.resolve(json as A3SAutoconfig));
+            .then(json => Promise.resolve(json as A3sAutoconfigDto));
     }
 
-    public getServerInfo(): Promise<A3SServerInfo> {
+    public setAutoconfig(autoconfig: A3sAutoconfigDto): Promise<void> {
+        return this.setFile(A3SFiles.AUTOCONFIG, serializeA3sAutoconfig(autoconfig));
+    }
+
+    public getServerInfo(): Promise<A3sServerInfoDto> {
         return this
             .getFile(A3SFiles.SERVERINFO)
-            .then(json => Promise.resolve(json as A3SServerInfo));
+            .then(json => Promise.resolve(json as A3sServerInfoDto));
+    }
+
+    public setServerInfo(serverInfo: A3sServerInfoDto): Promise<void> {
+        return this.setFile(A3SFiles.SERVERINFO, serializeA3sServerInfo(serverInfo));
     }
 
     public getSync(): Promise<A3sSyncTreeDirectoryDto> {
@@ -55,14 +77,14 @@ export class A3sDirectory implements A3sAccess {
     }
 
     private getFile(name: string): Promise<object> {
-        const path = this.directory + '/' + name;
+        const path = this.a3sDirectory + '/' + name;
         return promisify(readFile)(path)
             .then(rawFile => promisify(gunzip)(rawFile))
             .then((unzippedBuffer: Buffer) => Promise.resolve(new InputObjectStream(unzippedBuffer, false).readObject()));
     }
 
     private setFile(name: string, contents: GenericJObject): Promise<void> {
-        const path = this.directory + '/' + name;
+        const path = this.a3sDirectory + '/' + name;
         return Promise
             .resolve(new OutputObjectStream().writeObject(contents))
             .then(buffer => promisify(gzip)(buffer))

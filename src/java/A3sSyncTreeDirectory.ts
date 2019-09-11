@@ -1,9 +1,9 @@
 
-import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto, A3sSyncTreeNodeDto} from '../model/a3sSync';
+import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../model/a3sSync';
 import {java as serializers} from './serializer/implementation/index'
 import {java as fieldDeclarations, classField, bool} from './serializer/util/field-declarations'
 import {GenericJObject, IFieldDeclaration} from './serializer/interfaces';
-import {serializeA3sSyncTreeLeaf} from '../java/A3sSyncTreeLeaf';
+import {serializeA3sSyncTreeLeaf} from './A3sSyncTreeLeaf';
 
 export const serializeA3sSyncTreeDirectory = function(
     dto: A3sSyncTreeDirectoryDto,

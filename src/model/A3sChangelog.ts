@@ -1,4 +1,4 @@
-export interface A3SChangelog {
+export interface A3sChangelog {
     revision: number
     buildDate: Date
     contentUpdated: boolean

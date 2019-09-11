@@ -1,29 +1,29 @@
 
-export interface A3SAutoconfig {
-    servers: A3SFavoriteServer[];
-    protocol: A3SRepositoryProtocol;
-    name: string;
+export interface A3sAutoconfigDto {
+    favoriteServers: A3sFavoriteServerDto[];
+    protocole: A3sRepositoryProtocolDto;
+    repositoryName: string;
 }
 
-export interface A3SRepositoryProtocol {
+export interface A3sRepositoryProtocolDto {
     connectionTimeOut: string
+    encryptionMode?: A3sEncryptionMode
+    protocolType?: A3sProtocolType
     login: string
     password: string
     port: string
     readTimeOut: string
     url: string
-    encryptionMode?: A3SEncryptionMode
-    protocolType?: A3SProtocolType
 }
 
-export interface A3SProtocolType {
+export interface A3sProtocolType {
     description: string
     prompt: string
     defaultPort: string
-    protocol: A3SProtocol
+    protocol: A3sProtocol
 }
 
-export interface A3SFavoriteServer {
+export interface A3sFavoriteServerDto {
     name: string
     ipAddress: string
     port: number
@@ -33,12 +33,12 @@ export interface A3SFavoriteServer {
     repositoryName: string
 }
 
-export interface A3SEncryptionMode {
+export interface A3sEncryptionMode {
     description: string
-    encryption: A3SEncryption
+    encryption: A3sEncryption
 }
 
-export enum A3SProtocol {
+export enum A3sProtocol {
     FTP,
     HTTP,
     HTTPS,
@@ -50,7 +50,7 @@ export enum A3SProtocol {
     SOCKS5
 }
 
-export enum A3SEncryption {
+export enum A3sEncryption {
     NO_ENCRYPTION,
     EXPLICIT_SSL,
     IMPLICIT_SSL

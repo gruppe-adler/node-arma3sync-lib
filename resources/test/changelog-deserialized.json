@@ -1,0 +1,22 @@
+{
+  "list": [
+    {
+      "revision": 1,
+      "buildDate": "2019-09-09",
+      "contentUpdated": false,
+      "newAddons": [
+        "@grad_bbq"
+      ],
+      "updatedAddons": [
+        "@gruppe_adler_mod",
+        "@cba"
+      ],
+      "deletedAddons": [
+        "@bloodlust"
+      ],
+      "addons": [
+        "@tfar_autoswitch"
+      ]
+    }
+  ]
+}

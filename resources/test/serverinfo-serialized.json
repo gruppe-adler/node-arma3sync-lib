@@ -1,0 +1,79 @@
+{
+  "$": {
+    "compressedPboFilesOnly": false,
+    "noPartialFileTransfer": false,
+    "numberOfConnections": 1,
+    "numberOfFiles": 2,
+    "repositoryContentUpdated": true,
+    "revision": 1,
+    "totalFilesSize": 2336,
+    "buildDate": {
+      "$": {},
+      "$class": {
+        "name": "java.util.Date",
+        "serialVersionUID": "7523967970034938905",
+        "flags": 3,
+        "fields": [],
+        "superClass": null
+      },
+      "_$": "2019-08-14T16:48:54.718Z"
+    },
+    "hiddenFolderPaths": {
+      "$": {},
+      "$class": {
+        "name": "java.util.HashSet",
+        "serialVersionUID": "-5024744406713321676",
+        "flags": 3,
+        "fields": [],
+        "superClass": null
+      },
+      "_$": []
+    }
+  },
+  "$class": {
+    "name": "fr.soe.a3s.domain.repository.ServerInfo",
+    "serialVersionUID": "7697232677958952953",
+    "flags": 2,
+    "fields": [
+      {
+        "type": "Z",
+        "name": "compressedPboFilesOnly"
+      },
+      {
+        "type": "Z",
+        "name": "noPartialFileTransfer"
+      },
+      {
+        "type": "I",
+        "name": "numberOfConnections"
+      },
+      {
+        "type": "J",
+        "name": "numberOfFiles"
+      },
+      {
+        "type": "Z",
+        "name": "repositoryContentUpdated"
+      },
+      {
+        "type": "I",
+        "name": "revision"
+      },
+      {
+        "type": "J",
+        "name": "totalFilesSize"
+      },
+      {
+        "type": "L",
+        "name": "buildDate",
+        "classname": "Ljava/util/Date;"
+      },
+      {
+        "type": "L",
+        "name": "hiddenFolderPaths",
+        "classname": "Ljava/util/Set;"
+      }
+    ],
+    "superClass": null
+  }
+}

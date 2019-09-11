@@ -1,6 +1,5 @@
-import {exec} from 'child_process';
 import {promisify} from 'util';
-import {Path} from '../util/aliases';
+import {Path} from '../../util/aliases';
 import {Dirent, readdir, stat, unlink} from 'fs';
 
 function sum(numbers: number[]): number {
@@ -62,7 +61,7 @@ export class ZSyncGenerationService {
     constructor(
         private repoPublicURL: string, /* ex. http://gruppe-adler.de/arma3sync */
         private repoPath: Path,  /* ex. /var/lib/arma3sync */
-        private customSpawn: Function = null,
+        private zsyncmake: (file: Path) => void,
     ) {}
 
     /**
@@ -70,18 +69,7 @@ export class ZSyncGenerationService {
      */
     public async writeSingle(file: Path): Promise<void> {
         ZSyncGenerationService.checkPath(file);
-
-        const cmdLine = this.getCmdLine(file);
-        let execFunc = promisify(exec);
-        if (this.customSpawn) {
-            execFunc = this.customSpawn as any;
-        }
-        const result = await execFunc(cmdLine);
-        if (result.stdout.length || result.stderr.length > 0) {
-            console.warn('output from zsync:');
-            console.warn('OUT ' + result.stdout.toString());
-            console.warn('ERR ' + result.stderr.toString());
-        }
+        return this.zsyncmake(file);
     }
 
     private async writeRelativeSingle(relativePath: Path, filename: string): Promise<void> {
@@ -123,7 +111,7 @@ export class ZSyncGenerationService {
      * update all zsyncs if they're older than the files they refer to,
      * or create if not existent
      */
-    public async update(relativePath: Path): Promise<UpdateResult> {
+    public async update(relativePath: Path = ''): Promise<UpdateResult> {
         if (!this.repoPath || this.repoPath === '/') {
             throw new Error('repo path is filesystem root. this should not be.');
         }
@@ -134,7 +122,9 @@ export class ZSyncGenerationService {
     private async updateRecursion(relativePath: Path): Promise<UpdateResult> {
         const absolutePath = this.repoPath + relativePath;
         const entries: Dirent[] = await promisify(readdir)(absolutePath, {withFileTypes: true});
-        const subdirs: string[] = entries.filter(dirent => dirent.isDirectory() && dirent.name !== '.' && dirent.name !== '..').map(dirent => dirent.name);
+        const subdirs: string[] = entries
+            .filter(dirent => dirent.isDirectory() && dirent.name !== '.' && dirent.name !== '..' && dirent.name !== '.a3s')
+            .map(dirent => dirent.name);
         return UpdateResult.sum(await Promise.all(subdirs.map(subdir => {
             return this.update(`${relativePath}/${subdir}`);
         })));

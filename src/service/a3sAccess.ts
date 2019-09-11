@@ -1,8 +1,8 @@
-import {A3SChangelog} from '../model/a3sChangelog';
-import {A3SServerInfo} from '../model/a3sServerInfo';
+import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
 import {A3sSyncTreeDirectoryDto} from '../model/a3sSync';
-import {A3SAutoconfig} from '../model/a3SAutoconfig';
-import {A3sEventsDto} from '../model/a3sEventsDto';
+import {A3sAutoconfigDto} from '../dto/A3sAutoconfigDto';
+import {A3sEventsDto} from '../model/A3sEventsDto';
+import {A3sChangelogs} from '../model/A3sChangelogs';
 
 export enum A3SFiles {
     AUTOCONFIG = 'autoconfig',
@@ -14,8 +14,8 @@ export enum A3SFiles {
 
 export interface A3sAccess {
     getEvents(): Promise<A3sEventsDto>
-    getChangelogs():Promise<A3SChangelog>
-    getServerInfo(): Promise<A3SServerInfo>
+    getChangelogs():Promise<A3sChangelogs>
+    getServerInfo(): Promise<A3sServerInfoDto>
     getSync(): Promise<A3sSyncTreeDirectoryDto>
-    getRepository(): Promise<A3SAutoconfig>
+    getAutoconfig(): Promise<A3sAutoconfigDto>
 }

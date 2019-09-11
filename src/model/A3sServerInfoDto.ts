@@ -1,4 +1,4 @@
-export interface A3SServerInfo {
+export interface A3sServerInfoDto {
     revision: number
     buildDate: Date
     numberOfFiles: number

@@ -1,6 +1,6 @@
-import {A3sEventDto} from '../model/a3sEventsDto';
 import {java as serializers} from '../java/serializer/implementation'
-import {GenericJObject, Serializer} from '../java/serializer/interfaces';
+import {GenericJObject, Serializer} from './serializer/interfaces';
+import {A3sEventDto} from '../model/A3sEventDto';
 
 export const a3sEventSerialize: Serializer<A3sEventDto> = function(dto: A3sEventDto): GenericJObject {
     return {
