@@ -13,6 +13,10 @@ export interface A3sSyncTreeDirectoryDto extends A3sSyncTreeNodeDto {
     markAsAddon: boolean
 }
 
+/**
+ * NOTE: The tree that gets saved NEVER contains nodes with deleted:true or updated:true.
+ *       It seems those attributes are only really there for the in-memory working set :facepalm:
+ */
 export interface A3sSyncTreeNodeDto extends Child<A3sSyncTreeDirectoryDto> {
     deleted: boolean
     name: string

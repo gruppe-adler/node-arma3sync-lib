@@ -2,19 +2,30 @@ import {RepoBuildService} from './RepoBuildService';
 import {A3sDirectory} from './A3sDirectory';
 import {SyncGenerationService} from './sync/SyncGenerationService';
 import {UpdateResult, ZSyncGenerationService} from './zsync/ZSyncGenerationService';
-import {A3sSyncTreeDirectoryDto} from '../model/a3sSync';
 import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
 import {util} from 'config';
-import {A3sChangelogs} from '../model/A3sChangelogs';
-
-jest.mock('./A3sDirectory');
-jest.mock('./sync/SyncGenerationService');
-jest.mock('./zsync/ZSyncGenerationService');
+import {A3sChangelogsDto} from '../model/A3sChangelogsDto';
+import {SyncTreeBranch} from '../model/SyncTreeBranch';
+import {SyncTreeLeaf} from '../model/SyncTreeLeaf';
+import {SyncComparisonService} from './sync/SyncComparisonService';
+import {Changelogs} from '../model/Changelogs';
 
 util.setModuleDefaults("arma3sync-lib", {
     repoPath: '/var/lib/repo',
     publicURL: 'http://foo'
 });
+
+const oldServerInfo: A3sServerInfoDto = {
+    revision: 1,
+    buildDate: new Date('1970-01-01'),
+    numberOfFiles: 42,
+    totalFilesSize: 137,
+    noPartialFileTransfer: false,
+    numberOfConnections: 3,
+    hiddenFolderPaths: [],
+    repositoryContentUpdated: false,
+    compressedPboFilesOnly: false,
+};
 
 describe(RepoBuildService.name, () => {
 
@@ -24,32 +35,23 @@ describe(RepoBuildService.name, () => {
 
     describe('update', () => {
         it('uses zsyncservice to walk over everything', async (done) => {
-
-            const oldServerInfo: A3sServerInfoDto = {
-                revision: 1,
-                buildDate: new Date('1970-01-01'),
-                numberOfFiles: 42,
-                totalFilesSize: 1337,
-                noPartialFileTransfer: false,
-                numberOfConnections: 3,
-                hiddenFolderPaths: [],
-                repositoryContentUpdated: false,
-                compressedPboFilesOnly: false,
-            };
-
             const a3sDirectory = {
+                getSync: jest.fn(() => Promise.resolve(new SyncTreeBranch('', '', false, {}, {}))),
                 setSync: jest.fn(() => Promise.resolve()),
                 getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
                 setServerInfo: jest.fn(() => Promise.resolve()),
+                getChangelogs: jest.fn(() => Promise.resolve(new Changelogs())),
+                setChangelogs: jest.fn(() => Promise.resolve()),
             };
-            const expectedSyncTree: A3sSyncTreeDirectoryDto = {
-                list: [],
-                hidden: false,
-                markAsAddon: false,
-                name: 'racine',
-                deleted: false,
-                updated: false,
-            };
+            const expectedSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
+                    '@cba' : new SyncTreeBranch('@cba', '/@cba', true, {}, {
+                        'cba.file': new SyncTreeLeaf('cba.file', '@cba', '/@cba/cba.file', 'sha1', 1337)
+                    }),
+                    '@ace': new SyncTreeBranch('@ace', '/@ace', true, {}, {
+                        'ace.file': new SyncTreeLeaf('ace.file', '@ace', '/@ace/ace.file', 'sha1', 42)
+                    }),
+                } ,{});
+
             const syncGenerationService = {
                 generateSync: jest.fn(() => Promise.resolve(expectedSyncTree))
             };
@@ -58,12 +60,14 @@ describe(RepoBuildService.name, () => {
             const zsyncGenerationService = {
                 update: jest.fn(() => Promise.resolve(expectedZsyncResult))
             };
+            const syncComparisonService = new SyncComparisonService();
 
             const now = Date.now();
             const repoBuildService = new RepoBuildService(
                 a3sDirectory as unknown as A3sDirectory,
                 syncGenerationService as unknown as SyncGenerationService,
                 zsyncGenerationService as unknown as ZSyncGenerationService,
+                syncComparisonService,
             );
 
             const updateResult = await repoBuildService.update();
@@ -84,8 +88,22 @@ describe(RepoBuildService.name, () => {
             const newServerInfo = a3sDirectory.setServerInfo.mock.calls[0][0] as A3sServerInfoDto;
             expect(newServerInfo.revision).toEqual(2);
             expect(newServerInfo.buildDate.valueOf()).toBeGreaterThanOrEqual(now);
+            expect(newServerInfo.numberOfConnections).toBe(3);
+            expect(newServerInfo.totalFilesSize).toBe(1379);
+            expect(newServerInfo.numberOfFiles).toBe(2);
 
             expect(updateResult.serverInfo).toEqual(newServerInfo);
+
+            // @ts-ignore
+            const changelogs = a3sDirectory.setChangelogs.mock.calls[0][0] as A3sChangelogsDto;
+            expect(changelogs).toBeInstanceOf(Changelogs);
+            expect(changelogs.list).toHaveLength(1);
+            const newChangelog = changelogs.list[0];
+            expect(newChangelog.revision).toBe(2);
+            expect(newChangelog.newAddons).toEqual(['@cba', '@ace']);
+            expect(newChangelog.addons).toEqual(['@cba', '@ace']);
+            expect(newChangelog.updatedAddons).toEqual([]);
+            expect(newChangelog.deletedAddons).toEqual([]);
 
             done();
         });
@@ -94,7 +112,8 @@ describe(RepoBuildService.name, () => {
     describe('initializeRepository', () => {
         it('creates all the repo files', async (done) => {
             const a3sDirectory = {
-                setSync: jest.fn(() => Promise.resolve()),
+                setRawSync: jest.fn(() => Promise.resolve()),
+                getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
                 setServerInfo: jest.fn(() => Promise.resolve()),
                 setAutoconfig: jest.fn(() => Promise.resolve()),
                 setEvents: jest.fn(() => Promise.resolve()),
@@ -102,23 +121,31 @@ describe(RepoBuildService.name, () => {
             };
             const zsyncGenerationService = {};
             const syncGenerationService = {};
+            const syncComparisonService = new SyncComparisonService();
 
             const repoBuildService = new RepoBuildService(a3sDirectory as unknown as A3sDirectory,
                 syncGenerationService as unknown as SyncGenerationService,
-                zsyncGenerationService as unknown as ZSyncGenerationService
+                zsyncGenerationService as unknown as ZSyncGenerationService,
+                syncComparisonService as SyncComparisonService,
             );
             await repoBuildService.initializeRepository();
 
             expect(a3sDirectory.setServerInfo.mock.calls).toHaveLength(1);
-            expect(a3sDirectory.setSync.mock.calls).toHaveLength(1);
+            expect(a3sDirectory.setRawSync.mock.calls).toHaveLength(1);
             expect(a3sDirectory.setAutoconfig.mock.calls).toHaveLength(1);
             expect(a3sDirectory.setEvents.mock.calls).toHaveLength(1);
             expect(a3sDirectory.setChangelogs.mock.calls).toHaveLength(1);
             expect(a3sDirectory.setChangelogs.mock.calls[0]).toHaveLength(1);
             // @ts-ignore
-            const initialChangelogs = a3sDirectory.setChangelogs.mock.calls[0][0] as A3sChangelogs;
+            const initialChangelogs = a3sDirectory.setChangelogs.mock.calls[0][0] as A3sChangelogsDto;
             expect(initialChangelogs.list[0].revision).toBe(0);
             expect(initialChangelogs.list[0].addons).toHaveLength(0);
+
+            // @ts-ignore
+            const serverInfo = a3sDirectory.setServerInfo.mock.calls[0][0] as A3sServerInfoDto;
+            expect(serverInfo.numberOfConnections).toBe(1);
+            expect(serverInfo.totalFilesSize).toBe(0);
+            expect(serverInfo.numberOfFiles).toBe(0);
 
             done();
         });

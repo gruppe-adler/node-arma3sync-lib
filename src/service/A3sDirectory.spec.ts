@@ -3,9 +3,10 @@ import {A3sSyncTreeDirectoryDto, stripCircularReferences} from '../model/a3sSync
 import {A3sDirectory} from './A3sDirectory';
 import {A3sEventsDto} from '../model/A3sEventsDto';
 import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
-import {A3sChangelogs} from '../model/A3sChangelogs';
+import {A3sChangelogsDto} from '../model/A3sChangelogsDto';
 import {A3sAutoconfigDto} from '../dto/A3sAutoconfigDto';
 import {util} from 'config';
+import {SyncTreeBranch} from '../model/SyncTreeBranch';
 
 util.setModuleDefaults("arma3sync-lib", {
     repoPath: '/var/lib/repo',
@@ -50,8 +51,8 @@ function getExampleServerInfo(): A3sServerInfoDto {
     return exampleServerInfo;
 }
 
-function getExampleChangelogs(): A3sChangelogs {
-    const changelogs = JSON.parse(readFileSync(testChangelogJsonFile).toString()) as A3sChangelogs;
+function getExampleChangelogs(): A3sChangelogsDto {
+    const changelogs = JSON.parse(readFileSync(testChangelogJsonFile).toString()) as A3sChangelogsDto;
     changelogs.list.forEach(changelog => {
         changelog.buildDate = new Date(changelog.buildDate);
     });
@@ -97,9 +98,9 @@ describe(A3sDirectory.name, () => {
         });
     });
 
-    describe('getSync', function () {
+    describe('getRawSync', function () {
         it('reads the example sync file', async () => {
-            const sync: A3sSyncTreeDirectoryDto = await examplesDirectory.getSync();
+            const sync: A3sSyncTreeDirectoryDto = await examplesDirectory.getRawSync();
 
             stripCircularReferences(sync);
 
@@ -107,12 +108,35 @@ describe(A3sDirectory.name, () => {
         })
     });
 
+    describe('getSync', () => {
+        it('skips on the /racine as root name', async (done) => {
+            const sync: SyncTreeBranch = await examplesDirectory.getSync();
+            expect(sync.name).toBe('');
+            expect(sync.path).toBe('');
+            expect(sync.branches['@tfar_autoswitch'].name).toBe('@tfar_autoswitch');
+            expect(sync.branches['@tfar_autoswitch'].path).toBe('/@tfar_autoswitch');
+            done();
+        });
+    });
+
     describe('setSync', () => {
+        it('nicely puts everything into the dto etc', async (done) => {
+            const sync: SyncTreeBranch = await examplesDirectory.getSync();
+
+            const dtoTree = sync.toDto();
+
+            expect(dtoTree).toEqual(getExampleSync());
+
+            done();
+        });
+    });
+
+    describe('setRawSync', () => {
         it('works', (done) => {
             const access = new A3sDirectory('/tmp');
-            access.setSync(getExampleSync()).then(result => {
+            access.setRawSync(getExampleSync()).then(result => {
                 // re-read to check
-                access.getSync().then((writtenSync) => {
+                access.getRawSync().then((writtenSync) => {
                     stripCircularReferences(writtenSync);
                     expect(writtenSync).toEqual(getExampleSync());
                     done();
@@ -144,7 +168,7 @@ describe(A3sDirectory.name, () => {
     describe('setChangelogs', () => {
         it('writes changelog entries', async (done) => {
             const access = new A3sDirectory('/tmp');
-            const changelogs: A3sChangelogs = getExampleChangelogs();
+            const changelogs: A3sChangelogsDto = getExampleChangelogs();
 
             await access.setChangelogs(changelogs);
             const reReadChangelog = await access.getChangelogs();

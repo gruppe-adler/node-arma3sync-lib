@@ -1,9 +1,11 @@
-import {A3sSyncTreeDirectoryDto, A3sSyncTreeLeafDto} from '../../model/a3sSync';
 import * as crypto from 'crypto'
 import {createReadStream, Dirent, readdir, stat} from 'fs'
 import {promisify} from 'util';
 import {Path} from '../../util/aliases';
 import {getLogger} from '../../config';
+import {SyncTreeBranch} from '../../model/SyncTreeBranch';
+import {SyncTreeLeaf} from '../../model/SyncTreeLeaf';
+import {toNameMap} from '../../util/funcs';
 
 function checkPath(subDir: Path) {
     if (!subDir.startsWith('/')) {
@@ -15,11 +17,11 @@ export class SyncGenerationService {
     constructor(private repoPath: string) {
     }
 
-    public generateSync(): Promise<A3sSyncTreeDirectoryDto> {
+    public generateSync(): Promise<SyncTreeBranch> {
         return this.walk(this.repoPath);
     }
 
-    public generatePartialSync(subDir: Path): Promise<A3sSyncTreeDirectoryDto> {
+    public generatePartialSync(subDir: Path): Promise<SyncTreeBranch> {
         checkPath(subDir);
         return this.walk(this.repoPath + subDir);
     }
@@ -46,17 +48,9 @@ export class SyncGenerationService {
         });
     }
 
-    private async walk(currentPath: string): Promise<A3sSyncTreeDirectoryDto> {
+    private async walk(currentPath: string, addon: string = ''): Promise<SyncTreeBranch> {
         const subPath = currentPath.slice(this.repoPath.length);
-        const name = subPath.split('/').pop() || 'racine';
-        const tree: A3sSyncTreeDirectoryDto = {
-            deleted: false,
-            hidden: false,
-            markAsAddon: name.startsWith('@'),
-            updated: false,
-            list: [],
-            name,
-        };
+        const name = subPath.split('/').pop() || '';
 
         let entries: Dirent[] = [];
         try {
@@ -65,9 +59,14 @@ export class SyncGenerationService {
             getLogger().error(e.message);
             return Promise.reject(e);
         }
-        const files = entries.filter((entry: Dirent) => entry.isFile() && !entry.name.endsWith('.zsync'));
-        const dataDirectories = entries.filter((file) => file.isDirectory() && file.name !== '.a3s');
 
+        const dataDirectories: Dirent[] = entries.filter((file) => file.isDirectory() && file.name !== '.a3s');
+        addon = dataDirectories.find(dir => dir.name === 'addons') ? name : addon;
+        const directoryDtos: { [p: string]: SyncTreeBranch } = toNameMap<SyncTreeBranch>(await Promise.all(
+            dataDirectories.map((file) => this.walk(currentPath + '/' + file.name, addon))
+        ));
+
+        const files = entries.filter((entry: Dirent) => entry.isFile() && !entry.name.endsWith('.zsync'));
         const allFileHashes = await Promise.all(
             files.map((file: Dirent) => {
                 return this.hash(currentPath + '/' + file.name);
@@ -76,22 +75,25 @@ export class SyncGenerationService {
         const fileSizes = await Promise.all(files.map((file: Dirent) => {
             return promisify(stat)(currentPath + '/' + file.name)
         }));
-        const leafDtos: (A3sSyncTreeLeafDto | A3sSyncTreeDirectoryDto)[] = allFileHashes.map((hash, idx) => {
-            return {
-                compressed: false,
-                compressedSize: 0,
-                deleted: false,
-                size: fileSizes[idx].size,
-                updated: false,
-                name: files[idx].name,
-                sha1: hash,
-            };
-        });
-        const directoryDtos: (A3sSyncTreeLeafDto | A3sSyncTreeDirectoryDto)[] = await Promise.all(
-            dataDirectories.map((file) => this.walk(currentPath + '/' + file.name))
-        );
-        tree.list = directoryDtos.concat(leafDtos);
 
-        return tree;
+
+
+        const leafDtos: SyncTreeLeaf[] = allFileHashes.map((hash, idx) => {
+            return new SyncTreeLeaf(
+                files[idx].name,
+                addon,
+                subPath + '/' + files[idx].name,
+                hash,
+                fileSizes[idx].size,
+            );
+        });
+
+        return new SyncTreeBranch(
+            name,
+            subPath,
+            Boolean(directoryDtos['addons']),
+            directoryDtos,
+            toNameMap(leafDtos),
+        );
     }
 }

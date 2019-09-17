@@ -1,9 +1,9 @@
 import {GenericJObject} from './serializer/interfaces';
 import {bool, classField, int} from './serializer/util/field-declarations';
 import {java as serializer} from './serializer/implementation';
-import {A3sChangelog} from '../model/A3sChangelog';
+import {A3sChangelogDto} from '../model/A3sChangelogDto';
 
-export function serializeA3sChangelog(changelog: A3sChangelog): GenericJObject {
+export function serializeA3sChangelog(changelog: A3sChangelogDto): GenericJObject {
     return {
         $: {
             contentUpdated: changelog.contentUpdated,

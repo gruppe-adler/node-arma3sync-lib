@@ -1,15 +1,15 @@
 import {UpdateResult, ZSyncGenerationService} from './zsync/ZSyncGenerationService';
 import {A3sDirectory} from './A3sDirectory';
 import {SyncGenerationService} from './sync/SyncGenerationService';
-import {A3sSyncTreeDirectoryDto} from '../model/a3sSync';
 import {A3SServerInfo} from '../model/A3SServerInfo';
 import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
 import {get} from 'config';
-import {mkdirSync} from 'fs';
+import {SyncTreeBranch} from '../model/SyncTreeBranch';
+import {SyncComparisonService} from './sync/SyncComparisonService';
 
 interface BuildInfo {
     zsyncUpdateInfo: UpdateResult,
-    syncUpdateInfo: A3sSyncTreeDirectoryDto,
+    syncUpdateInfo: SyncTreeBranch,
     serverInfo: A3sServerInfoDto
 }
 
@@ -31,15 +31,26 @@ export class RepoBuildService {
         private a3sDirectory: A3sDirectory,
         private syncGenerationService: SyncGenerationService,
         private zsyncGenerationService: ZSyncGenerationService,
+        private syncComparisonService: SyncComparisonService,
         ) {}
 
 
     public async update(): Promise<BuildInfo> {
+        const oldSync = await this.a3sDirectory.getSync();
         const newSync = await this.syncGenerationService.generateSync();
-        await this.a3sDirectory.setSync(newSync);
-        const serverInfo = new A3SServerInfo(await this.a3sDirectory.getServerInfo()).newRevision();
+        const diff = await this.syncComparisonService.compare(oldSync, newSync);
+        const serverInfo = new A3SServerInfo(await this.a3sDirectory.getServerInfo())
+            .newRevision()
+            .setTotalFileCount(diff.counts.totalCount.b)
+            .setTotalFilesSize(diff.counts.totalSize.b);
         const zsyncUpdateInfo = await this.zsyncGenerationService.update();
-        await this.a3sDirectory.setServerInfo(serverInfo.getDto());
+        const changelogs = await this.a3sDirectory.getChangelogs();
+
+        await Promise.all([
+            this.a3sDirectory.setSync(newSync),
+            this.a3sDirectory.setServerInfo(serverInfo.getDto()),
+            this.a3sDirectory.setChangelogs(changelogs.addFromDiff(diff.mods, serverInfo.getDto())),
+        ]);
         return {
             zsyncUpdateInfo: zsyncUpdateInfo,
             syncUpdateInfo: newSync,
@@ -63,7 +74,6 @@ export class RepoBuildService {
         if (protocol !== 'http') {
             throw new Error('TODO: support protocols other than HTTP');
         }
-
 
         return Promise.all([
             this.a3sDirectory.setAutoconfig({
@@ -94,7 +104,7 @@ export class RepoBuildService {
                 list: [],
             }),
             this.a3sDirectory.setServerInfo(A3SServerInfo.emptyServerInfo().getDto()),
-            this.a3sDirectory.setSync({
+            this.a3sDirectory.setRawSync({
                 deleted: false,
                 hidden: false,
                 markAsAddon: false,

@@ -10,6 +10,18 @@ export class A3SServerInfo {
         return this;
     }
 
+    public setTotalFilesSize(size: number): A3SServerInfo {
+        this.dto.totalFilesSize = size;
+
+        return this;
+    }
+
+    public setTotalFileCount(count: number): A3SServerInfo {
+        this.dto.numberOfFiles = count;
+
+        return this;
+    }
+
     public getDto(): A3sServerInfoDto {
         return this.dto;
     }

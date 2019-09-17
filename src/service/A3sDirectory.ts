@@ -12,9 +12,11 @@ import {serializeA3sSyncTreeDirectory} from '../java/A3sSyncTreeDirectory';
 import {GenericJObject} from '../java/serializer/interfaces';
 import {Path} from '../util/aliases';
 import {serializeA3sServerInfo} from '../java/A3sServerInfo';
-import {A3sChangelogs} from '../model/A3sChangelogs';
+import {A3sChangelogsDto} from '../model/A3sChangelogsDto';
 import {serializeA3sChangelogs} from '../java/A3sChangelogs';
 import {serializeA3sAutoconfig} from '../java/serializer/A3sAutoconfig';
+import {SyncTreeBranch} from '../model/SyncTreeBranch';
+import {Changelogs} from '../model/Changelogs';
 
 /**
  * read and write the files in /.a3s : Provides type safety, but does not guarantee consistency across files.
@@ -26,13 +28,13 @@ export class A3sDirectory implements A3sAccess {
         }
     }
 
-    public getChangelogs(): Promise<A3sChangelogs> {
+    public getChangelogs(): Promise<Changelogs> {
         return this
             .getFile(A3SFiles.CHANGELOGS)
-            .then(json => Promise.resolve(json as A3sChangelogs));
+            .then(json => Promise.resolve(Changelogs.fromDto(json as A3sChangelogsDto)));
     }
 
-    public setChangelogs(changelogs: A3sChangelogs): Promise<void> {
+    public setChangelogs(changelogs: A3sChangelogsDto): Promise<void> {
         return this.setFile(A3SFiles.CHANGELOGS, serializeA3sChangelogs(changelogs))
     }
 
@@ -66,13 +68,23 @@ export class A3sDirectory implements A3sAccess {
         return this.setFile(A3SFiles.SERVERINFO, serializeA3sServerInfo(serverInfo));
     }
 
-    public getSync(): Promise<A3sSyncTreeDirectoryDto> {
+    public getRawSync(): Promise<A3sSyncTreeDirectoryDto> {
         return this
             .getFile(A3SFiles.SYNC)
             .then(json => Promise.resolve(json as A3sSyncTreeDirectoryDto));
     }
 
-    public setSync(sync: A3sSyncTreeDirectoryDto): Promise<void> {
+    public getSync(): Promise<SyncTreeBranch> {
+        return this.getRawSync().then(_ => {
+            return SyncTreeBranch.fromSyncTreeRoot(_);
+        });
+    }
+
+    public setSync(sync: SyncTreeBranch): Promise<void> {
+        return this.setRawSync(sync.toDto());
+    }
+
+    public setRawSync(sync: A3sSyncTreeDirectoryDto): Promise<void> {
         return this.setFile(A3SFiles.SYNC, serializeA3sSyncTreeDirectory(sync));
     }
 

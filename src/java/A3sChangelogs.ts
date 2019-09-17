@@ -1,10 +1,10 @@
 import {NormalJObject} from './serializer/interfaces';
 import {java} from './serializer/util/field-declarations';
-import {A3sChangelogs} from '../model/A3sChangelogs';
+import {A3sChangelogsDto} from '../model/A3sChangelogsDto';
 import {java as serializer} from './serializer/implementation';
 import {serializeA3sChangelog} from './A3sChangelog';
 
-export function serializeA3sChangelogs(changelogs: A3sChangelogs): NormalJObject<A3sChangelogs> {
+export function serializeA3sChangelogs(changelogs: A3sChangelogsDto): NormalJObject<A3sChangelogsDto> {
     const jObject =  {
         $: {
             list: null,
