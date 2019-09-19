@@ -25,7 +25,7 @@ describe(SyncComparisonService.name, () => {
             expect(emitter).toBeInstanceOf(Promise);
         });
         it('returns return value of modDiff and fileDiff', async () => {
-            const modDiffResult = new ModDiffResult([], [], []);
+            const modDiffResult = new ModDiffResult([], [], [], []);
             const fileDiffResult = new FileDiffResult([], [], []);
             service.modDiff = jest.fn(() => modDiffResult);
             service.fileDiff = jest.fn(() => fileDiffResult);
