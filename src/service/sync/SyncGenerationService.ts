@@ -60,7 +60,7 @@ export class SyncGenerationService {
             return Promise.reject(e);
         }
 
-        const dataDirectories: Dirent[] = entries.filter((file) => file.isDirectory() && file.name !== '.a3s');
+        const dataDirectories: Dirent[] = entries.filter((file) => (file.isDirectory() || file.isSymbolicLink()) && file.name !== '.a3s');
         addon = dataDirectories.find(dir => dir.name === 'addons') ? name : addon;
         const directoryDtos: { [p: string]: SyncTreeBranch } = toNameMap<SyncTreeBranch>(await Promise.all(
             dataDirectories.map((file) => this.walk(currentPath + '/' + file.name, addon))

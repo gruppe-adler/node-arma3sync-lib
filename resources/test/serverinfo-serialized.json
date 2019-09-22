@@ -3,10 +3,10 @@
     "compressedPboFilesOnly": false,
     "noPartialFileTransfer": false,
     "numberOfConnections": 1,
-    "numberOfFiles": 2,
+    "numberOfFiles": 4,
     "repositoryContentUpdated": true,
-    "revision": 1,
-    "totalFilesSize": 2336,
+    "revision": 2,
+    "totalFilesSize": 2820,
     "buildDate": {
       "$": {},
       "$class": {
@@ -16,7 +16,7 @@
         "fields": [],
         "superClass": null
       },
-      "_$": "2019-08-14T16:48:54.718Z"
+      "_$": "2019-09-22T19:19:40.213Z"
     },
     "hiddenFolderPaths": {
       "$": {},

@@ -16,13 +16,31 @@ describe(SyncGenerationService.name, () => {
             expect(sync).toBeTruthy();
             expect(sync.isAddon).toBeFalsy();
             expect(sync.name).toBe('');
-            expect(Object.keys(sync.branches)).toHaveLength(1);
+            expect(Object.keys(sync.branches)).toHaveLength(2);
             expect(sync.branches['@tfar_autoswitch'].name).toBe('@tfar_autoswitch');
             const tfar = sync.branches['@tfar_autoswitch'] as SyncTreeBranch;
             expect(tfar.isAddon).toBe(true);
             const addons = tfar.branches['addons'] as SyncTreeBranch;
             expect(addons).toBeInstanceOf(SyncTreeBranch);
             expect(addons.isAddon).toBe(false);
+            done();
+        });
+        it('follows symlinks!', async (done) => {
+            const sync = await generatingSync;
+
+            expect(sync).toBeTruthy();
+            expect(sync.branches['@symlinkedMod']).toBeInstanceOf(SyncTreeBranch);
+            expect(sync.branches['@symlinkedMod'].name).toBe('@symlinkedMod');
+            expect(sync.branches['@symlinkedMod'].isAddon).toBe(true);
+            expect(sync.branches['@symlinkedMod'].branches['addons'].name).toBe('addons');
+            done();
+        });
+        it('follows symlinks and correctly sha1s an empty file to "0" (yeah thats stupid)', async (done) => {
+            const sync = await generatingSync;
+
+            expect(sync).toBeTruthy();
+            expect(sync.branches['@symlinkedMod'].name).toBe('@symlinkedMod');
+            expect(sync.branches['@symlinkedMod'].branches['addons'].leaves['foo'].sha1).toBe("0");
             done();
         });
         it('lists & checksums files', async (done) => {
