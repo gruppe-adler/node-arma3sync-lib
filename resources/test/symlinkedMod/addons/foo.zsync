@@ -1,9 +1,0 @@
-zsync: jazsync
-Filename: foo
-MTime: Sun, 22 Sep 2019 20:18:54 +0200
-Blocksize: 8192
-Length: 0
-Hash-Lengths: 1,2,3
-URL: http://a3s.localhost/@symlinkedMod/addons/foo
-SHA-1: 0
-
