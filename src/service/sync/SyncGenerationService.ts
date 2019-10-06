@@ -1,5 +1,5 @@
 import * as crypto from 'crypto'
-import {createReadStream, Dirent, readdir, stat} from 'fs'
+import {createReadStream, Dirent, existsSync, readdir, readdirSync, readlinkSync, stat} from 'fs'
 import {promisify} from 'util';
 import {Path} from '../../util/aliases';
 import {getLogger} from '../../config';
@@ -60,20 +60,34 @@ export class SyncGenerationService {
             return Promise.reject(e);
         }
 
-        const dataDirectories: Dirent[] = entries.filter((file) => (file.isDirectory() || file.isSymbolicLink()) && file.name !== '.a3s');
+        const dataDirectories: Dirent[] = entries
+            .filter((file) => {
+                if (file.name === '.a3s') {
+                    return false;
+                }
+                if (file.isDirectory()) {
+                    return true;
+                }
+                if (file.isSymbolicLink()) {
+                    // potential performance hit: sync code
+                    const linkTarget = readlinkSync(`${currentPath}/${file.name}`);
+                    return existsSync(`${currentPath}/${linkTarget}`);
+                }
+                return false;
+            });
         addon = dataDirectories.find(dir => dir.name === 'addons') ? name : addon;
         const directoryDtos: { [p: string]: SyncTreeBranch } = toNameMap<SyncTreeBranch>(await Promise.all(
-            dataDirectories.map((file) => this.walk(currentPath + '/' + file.name, addon))
+            dataDirectories.map((file) => this.walk(`${currentPath}/${file.name}`, addon))
         ));
 
         const files = entries.filter((entry: Dirent) => entry.isFile() && !entry.name.endsWith('.zsync'));
         const allFileHashes = await Promise.all(
             files.map((file: Dirent) => {
-                return this.hash(currentPath + '/' + file.name);
+                return this.hash(`${currentPath}/${file.name}`);
             })
         );
         const fileSizes = await Promise.all(files.map((file: Dirent) => {
-            return promisify(stat)(currentPath + '/' + file.name)
+            return promisify(stat)(`${currentPath}/${file.name}`)
         }));
 
 

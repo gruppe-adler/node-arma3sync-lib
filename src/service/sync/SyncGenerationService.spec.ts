@@ -1,5 +1,5 @@
 import {SyncGenerationService} from './SyncGenerationService';
-import {readFileSync} from "fs";
+import {readFileSync, unlinkSync, symlinkSync} from 'fs';
 import {SyncTreeBranch} from '../../model/SyncTreeBranch';
 
 const a3sExampleModsDir = __dirname + '/../../../resources/test/repo';
@@ -69,6 +69,24 @@ describe(SyncGenerationService.name, () => {
             expect(emptyFile.size).toBe(0);
             expect(emptyFile.sha1).toBe("0");
             done();
+        });
+    });
+    describe('generateSync#brokenLink', () => {
+        beforeEach(() => {
+            symlinkSync('/tmp/i-most-definitely-do-not-exist' + Math.random(), `${a3sExampleModsDir}/@doesNotExist`);
+        });
+        afterEach(() => {
+            unlinkSync(`${a3sExampleModsDir}/@doesNotExist`);
+        });
+        it('does not fail if symlink target does not exist', async () => {
+            const service = new SyncGenerationService(a3sExampleModsDir);
+            await expect(service.generateSync()).resolves.toBeTruthy();
+        });
+        it('does not list symlink target that does not exist', async () => {
+            const service = new SyncGenerationService(a3sExampleModsDir);
+            const sync = await service.generateSync();
+
+            expect(sync.branches['@doesNotExist']).toBeFalsy();
         });
     });
 });
