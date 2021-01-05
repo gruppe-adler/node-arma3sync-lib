@@ -10,20 +10,20 @@
   },
   "dependencies": {
     "@types/config": "0.0.34",
-    "@types/node": "^12.7.2",
-    "config": "^3.2.2",
-    "java.io": "^2.4.0"
+    "@types/node": "12",
+    "config": "3",
+    "java.io": "2"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^24.0.18",
-    "@types/ncp": "^2.0.1",
-    "jest": "^24.9.0",
-    "ncp": "^2.0.0",
-    "ts-jest": "^24.0.2",
-    "codecov": "^3.7.2",
-    "typescript": "^3.5.3"
+    "@types/jest": "24",
+    "@types/ncp": "2",
+    "jest": "24",
+    "ncp": "2",
+    "ts-jest": "24",
+    "codecov": "3",
+    "typescript": "3"
   }
 }
