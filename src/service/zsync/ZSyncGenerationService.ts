@@ -175,12 +175,4 @@ export class ZSyncGenerationService {
             throw new Error('dont try to escape the repository');
         }
     }
-
-    /**
-     *
-     * @param file Path path within repo, e.g. /@mod/addons/foo.pbo
-     */
-    private getCmdLine(file: Path): string {
-        return `zsyncmake -eu ${this.repoPublicURL}${file} ${this.repoPath}${file} -o ${this.repoPath}${file}.zsync`;
-    }
 }
