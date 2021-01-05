@@ -15,8 +15,8 @@ export function serializeA3sChangelog(changelog: A3sChangelogDto): GenericJObjec
             updatedAddons: serializer.util.ArrayList(changelog.updatedAddons, x => x),
         },
         $class: {
-            name: "fr.soe.a3s.domain.repository.Changelogs",
-            serialVersionUID: "7332983755625818660",
+            name: "fr.soe.a3s.domain.repository.Changelog",
+            serialVersionUID: "749128678979864247",
             flags: 2,
             fields: [
                 bool("contentUpdated"),
