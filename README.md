@@ -1,5 +1,5 @@
 ![tests](https://img.shields.io/github/workflow/status/gruppe-adler/node-arma3sync-lib/Node%20CI?label=tests)
-[![codecov](https://codecov.io/gh/gruppe-adler/node-arma3sync-lib/branch/add-cc/graph/badge.svg)](https://codecov.io/gh/gruppe-adler/nodejs)
+[![codecov](https://codecov.io/gh/gruppe-adler/node-arma3sync-lib/branch/add-cc/graph/badge.svg)](https://codecov.io/gh/gruppe-adler/node-arma3sync-lib)
 
 
 # node-arma3sync-lib
