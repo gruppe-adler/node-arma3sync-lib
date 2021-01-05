@@ -1,6 +1,7 @@
 import {UpdateResult, ZSyncGenerationService} from './zsync/ZSyncGenerationService';
 import {A3sDirectory} from './A3sDirectory';
 import {SyncGenerationService} from './sync/SyncGenerationService';
+import {A3sProtocolTypeHTTP, A3sProtocolTypeHTTPS} from '../dto/A3sAutoconfigDto';
 import {A3SServerInfo} from '../model/A3SServerInfo';
 import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
 import {SyncTreeBranch} from '../model/SyncTreeBranch';
@@ -65,15 +66,21 @@ export class RepoBuildService {
             throw new Error('could not get proper URL from config');
         }
         let [protocol, host, port, path] = urlBits.slice(1);
-        // console.log(protocol); console.log(host); console.log(port); console.log(path);
+        
+        if (protocol !== 'http' && protocol !== 'https') {
+            throw new Error('TODO: support protocols other than HTTP and HTTPS');
+        }
+
+        let protocolType = A3sProtocolTypeHTTP
+
+        if (protocol === 'https') {
+            protocolType = A3sProtocolTypeHTTPS
+        }
 
         if (port) {
             port = port.substr(1);
         } else {
-            port = "80";
-        }
-        if (protocol !== 'http') {
-            throw new Error('TODO: support protocols other than HTTP');
+            port = protocolType.defaultPort;
         }
 
         return Promise.all([
@@ -85,6 +92,7 @@ export class RepoBuildService {
                     login: "anonymous",
                     password: "",
                     port: port,
+                    protocolType: protocolType,
                     readTimeOut: "300000",
                     url: [host, path].join('')
                 },
