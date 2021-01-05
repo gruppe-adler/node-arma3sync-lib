@@ -1,6 +1,6 @@
-module.exports = {
+{
   "roots": [
-    "<rootDir>",
+    "<rootDir>"
   ],
   "transform": {
     "^.+\\.tsx?$": "ts-jest"
@@ -8,5 +8,6 @@ module.exports = {
   "testEnvironment": "node",
   "moduleNameMapper": {
     "src/(.*)": "<rootDir>/src/$1"
-  }
-};
+  },
+  "collectCoverage": true
+}

@@ -1,6 +1,12 @@
 name: Node CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -9,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node: [10, 12]
+        node: [12, 14]
 
     steps:
     - uses: actions/checkout@v1
@@ -24,3 +30,8 @@ jobs:
         npm test
       env:
         CI: true
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: ./coverage/
