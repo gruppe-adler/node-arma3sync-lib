@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --config jestconfig.json",
     "build": "jest && node_modules/.bin/tsc && cp -r src/@types dist/"
   },
   "dependencies": {
@@ -23,6 +23,7 @@
     "jest": "^24.9.0",
     "ncp": "^2.0.0",
     "ts-jest": "^24.0.2",
+    "codecov": "^3.7.2",
     "typescript": "^3.5.3"
   }
 }
