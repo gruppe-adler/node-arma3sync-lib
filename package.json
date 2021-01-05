@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "build": "jest && node_modules/.bin/tsc && cp -r src/@types dist/"
+    "build": "jest --config jestconfig.json && node_modules/.bin/tsc && cp -r src/@types dist/"
   },
   "dependencies": {
     "@types/config": "0.0.34",
