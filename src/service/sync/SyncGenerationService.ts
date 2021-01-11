@@ -75,7 +75,8 @@ export class SyncGenerationService {
                 }
                 return false;
             });
-        addon = dataDirectories.find(dir => dir.name === 'addons') ? name : addon;
+        const isAddon = dataDirectories.find(dir => dir.name.toLowerCase() === 'addons') !== undefined;
+        addon = isAddon ? name : addon;
         const directoryDtos: { [p: string]: SyncTreeBranch } = toNameMap<SyncTreeBranch>(await Promise.all(
             dataDirectories.map((file) => this.walk(`${currentPath}/${file.name}`, addon))
         ));
@@ -105,7 +106,7 @@ export class SyncGenerationService {
         return new SyncTreeBranch(
             name,
             subPath,
-            Boolean(directoryDtos['addons']),
+            isAddon,
             directoryDtos,
             toNameMap(leafDtos),
         );
