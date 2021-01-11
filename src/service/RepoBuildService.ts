@@ -3,7 +3,6 @@ import {A3sDirectory} from './A3sDirectory';
 import {SyncGenerationService} from './sync/SyncGenerationService';
 import {A3SServerInfo} from '../model/A3SServerInfo';
 import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
-import {get} from 'config';
 import {SyncTreeBranch} from '../model/SyncTreeBranch';
 import {SyncComparisonService} from './sync/SyncComparisonService';
 
@@ -32,6 +31,8 @@ export class RepoBuildService {
         private syncGenerationService: SyncGenerationService,
         private zsyncGenerationService: ZSyncGenerationService,
         private syncComparisonService: SyncComparisonService,
+        private publicURL: string,
+        private repoName: string,
         ) {}
 
 
@@ -59,7 +60,7 @@ export class RepoBuildService {
     }
 
     public async initializeRepository(): Promise<void> {
-        const urlBits = get<string>("arma3sync-lib.publicURL").match(/^([a-z]+):\/\/([a-z0-9-.]+)([^\/]*)?(.*)$/);
+        const urlBits = this.publicURL.match(/^([a-z]+):\/\/([a-z0-9-.]+)([^\/]*)?(.*)$/);
         if (!urlBits) {
             throw new Error('could not get proper URL from config');
         }
@@ -87,7 +88,7 @@ export class RepoBuildService {
                     readTimeOut: "300000",
                     url: [host, path].join('')
                 },
-                repositoryName: "new repository"
+                repositoryName: this.repoName
             }),
             this.a3sDirectory.setChangelogs({
                 list: [{

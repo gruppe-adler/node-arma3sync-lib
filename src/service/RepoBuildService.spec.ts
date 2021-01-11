@@ -3,17 +3,14 @@ import {A3sDirectory} from './A3sDirectory';
 import {SyncGenerationService} from './sync/SyncGenerationService';
 import {UpdateResult, ZSyncGenerationService} from './zsync/ZSyncGenerationService';
 import {A3sServerInfoDto} from '../model/A3sServerInfoDto';
-import {util} from 'config';
 import {A3sChangelogsDto} from '../model/A3sChangelogsDto';
 import {SyncTreeBranch} from '../model/SyncTreeBranch';
 import {SyncTreeLeaf} from '../model/SyncTreeLeaf';
 import {SyncComparisonService} from './sync/SyncComparisonService';
 import {Changelogs} from '../model/Changelogs';
 
-util.setModuleDefaults("arma3sync-lib", {
-    repoPath: '/var/lib/repo',
-    publicURL: 'http://foo'
-});
+const publicURL = 'http://foo';
+const repoName = 'arma3sync';
 
 const oldServerInfo: A3sServerInfoDto = {
     revision: 1,
@@ -68,6 +65,8 @@ describe(RepoBuildService.name, () => {
                 syncGenerationService as unknown as SyncGenerationService,
                 zsyncGenerationService as unknown as ZSyncGenerationService,
                 syncComparisonService,
+                publicURL,
+                repoName,
             );
 
             const updateResult = await repoBuildService.update();
@@ -127,6 +126,8 @@ describe(RepoBuildService.name, () => {
                 syncGenerationService as unknown as SyncGenerationService,
                 zsyncGenerationService as unknown as ZSyncGenerationService,
                 syncComparisonService as SyncComparisonService,
+                publicURL,
+                repoName,
             );
             await repoBuildService.initializeRepository();
 

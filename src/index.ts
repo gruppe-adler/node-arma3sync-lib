@@ -7,6 +7,11 @@ import {RepoBuildService} from './service/RepoBuildService';
 import {SyncComparisonService} from './service/sync/SyncComparisonService';
 export {setLogger} from './config';
 
+if (!config.has('arma3sync-lib.repoName')) {
+    throw new Error('repoName not configured');
+}
+let repoName = config.get<string>('arma3sync-lib.repoName');
+
 if (!config.has('arma3sync-lib.repoPath')) {
     throw new Error('repoPath not configured');
 }
@@ -24,5 +29,7 @@ export const repoBuildService = new RepoBuildService(
     a3sDirectory,
     syncGenerationService,
     zsyncGenerationService,
-    new SyncComparisonService()
+    new SyncComparisonService(),
+    publicURL,
+    repoName,
 );
