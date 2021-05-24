@@ -12,3 +12,16 @@ a3s.getEvents().then(events => { /*pure awesome*/});
 
 ```
 
+## Configuration
+
+Currently uses [config](https://www.npmjs.com/package/config) and expects this config structure to exist:
+
+```js
+{
+  "arma3sync-lib": {
+    "publicURL": "", // public repository URL, ex. `http://mods.my-clan.com/`
+    "repoName": "", // repository name
+    "repoPath": "" // file path to the repository, ex. `/var/lib/a3s/mods`
+  }
+}
+```
