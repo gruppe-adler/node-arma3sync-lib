@@ -1,8 +1,7 @@
-import * as crypto from 'crypto'
-import {createReadStream, Dirent, existsSync, readdir, readdirSync, readlinkSync, stat} from 'fs'
+import {Dirent, existsSync, readdir, readdirSync, readlinkSync, stat} from 'fs'
 import {promisify} from 'util';
 import {Path} from '../../util/aliases';
-import {getLogger} from '../../config';
+import {getFileHasher, getLogger} from '../../config';
 import {SyncTreeBranch} from '../../model/SyncTreeBranch';
 import {SyncTreeLeaf} from '../../model/SyncTreeLeaf';
 import {toNameMap} from '../../util/funcs';
@@ -24,28 +23,6 @@ export class SyncGenerationService {
     public generatePartialSync(subDir: Path): Promise<SyncTreeBranch> {
         checkPath(subDir);
         return this.walk(this.repoPath + subDir);
-    }
-
-    private hash(file: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const hash = crypto.createHash('sha1');
-            hash.on('readable', () => {
-                const hashingResult = hash.read();
-                if (!hashingResult) {
-                    return;
-                }
-                const hashString = hashingResult.toString('hex');
-                // thats the hash for an empty file, apparently
-                resolve(hashString === 'da39a3ee5e6b4b0d3255bfef95601890afd80709' ? '0' : hashString);
-            });
-            const fStream = createReadStream(file);
-            fStream.on('data', (data) => {
-                hash.update(data);
-            });
-            fStream.on('end', () => {
-                hash.end();
-            });
-        });
     }
 
     private async walk(currentPath: string, addon: string = ''): Promise<SyncTreeBranch> {
@@ -84,7 +61,7 @@ export class SyncGenerationService {
         const files = entries.filter((entry: Dirent) => entry.isFile() && !entry.name.endsWith('.zsync'));
         const allFileHashes = await Promise.all(
             files.map((file: Dirent) => {
-                return this.hash(`${currentPath}/${file.name}`);
+                return getFileHasher().hash(`${currentPath}/${file.name}`);
             })
         );
         const fileSizes = await Promise.all(files.map((file: Dirent) => {
@@ -98,7 +75,7 @@ export class SyncGenerationService {
                 files[idx].name,
                 addon,
                 subPath + '/' + files[idx].name,
-                hash,
+                hash === 'da39a3ee5e6b4b0d3255bfef95601890afd80709' ? '0' : hash, // thats the hash for an empty file, apparently
                 fileSizes[idx].size,
             );
         });
