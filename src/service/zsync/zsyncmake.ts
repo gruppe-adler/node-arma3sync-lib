@@ -16,7 +16,7 @@ function checkPath(file: Path) {
 }
 
 function getCmdLine(publicURL: string, rootPath: Path, file: Path): string {
-    return `zsyncmake -eu "${publicURL}${file}" "${rootPath}${file}" -o "${rootPath}${file}.zsync"`;
+    return `zsyncmake -eu "${publicURL}${file}" -o "${rootPath}${file}.zsync" "${rootPath}${file}"`;
 }
 
 export async function zsyncmake(file: Path): Promise<void> {
