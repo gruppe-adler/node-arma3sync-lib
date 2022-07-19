@@ -4,7 +4,7 @@
 
 # node-arma3sync-lib
 
-Read and write Arma3Sync `.a3s` config data using JavaScript.
+Read and write [Arma3Sync](svn://www.sonsofexiled.fr/repository/ArmA3Sync/trunk) `.a3s` config data using JavaScript.
 
 ```ts
 const a3s = new A3sDirectory('/my/repo/path/.a3s/')
