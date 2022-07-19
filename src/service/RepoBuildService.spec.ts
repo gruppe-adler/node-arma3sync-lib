@@ -114,7 +114,7 @@ describe(RepoBuildService.name, () => {
                 setRawSync: jest.fn(() => Promise.resolve()),
                 getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
                 setServerInfo: jest.fn(() => Promise.resolve()),
-                setAutoconfig: jest.fn(() => Promise.resolve()),
+                setAutoconfig: jest.fn((args) => Promise.resolve()),
                 setEvents: jest.fn(() => Promise.resolve()),
                 setChangelogs: jest.fn(() => Promise.resolve()),
             };
@@ -148,7 +148,58 @@ describe(RepoBuildService.name, () => {
             expect(serverInfo.totalFilesSize).toBe(0);
             expect(serverInfo.numberOfFiles).toBe(0);
 
+            expect(a3sDirectory.setAutoconfig.mock.calls).toHaveLength(1);
+
+            const { protocole } = a3sDirectory.setAutoconfig.mock.calls[0][0];
+            expect(protocole.port).toBe('80');
+            expect(protocole.url).toBe('foo');
+
+            const { protocolType } = protocole;
+            expect(protocolType.defaultPort).toBe('80');
+            expect(protocolType.description).toBe('HTTP');
+            expect(protocolType.name).toBe('HTTP');
+            expect(protocolType.prompt).toBe('http://');
+
             done();
         });
+
+        it('supports HTTPS', async (done) => {
+            const publicURL = 'https://foo'
+
+            const a3sDirectory = {
+                setRawSync: jest.fn(() => Promise.resolve()),
+                getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
+                setServerInfo: jest.fn(() => Promise.resolve()),
+                setAutoconfig: jest.fn((args) => Promise.resolve()),
+                setEvents: jest.fn(() => Promise.resolve()),
+                setChangelogs: jest.fn(() => Promise.resolve()),
+            };
+            const zsyncGenerationService = {};
+            const syncGenerationService = {};
+            const syncComparisonService = new SyncComparisonService();
+
+            const repoBuildService = new RepoBuildService(a3sDirectory as unknown as A3sDirectory,
+                syncGenerationService as unknown as SyncGenerationService,
+                zsyncGenerationService as unknown as ZSyncGenerationService,
+                syncComparisonService as SyncComparisonService,
+                publicURL,
+                repoName,
+            );
+            await repoBuildService.initializeRepository();
+
+            expect(a3sDirectory.setAutoconfig.mock.calls).toHaveLength(1);
+
+            const { protocole } = a3sDirectory.setAutoconfig.mock.calls[0][0];
+            expect(protocole.port).toBe('443');
+            expect(protocole.url).toBe('foo');
+
+            const { protocolType } = protocole;
+            expect(protocolType.defaultPort).toBe('443');
+            expect(protocolType.description).toBe('HTTPS');
+            expect(protocolType.name).toBe('HTTPS');
+            expect(protocolType.prompt).toBe('https://');
+
+            done();
+        })
     });
 });

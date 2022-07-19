@@ -36,9 +36,9 @@ function serializeProtocole(protocole: A3sRepositoryProtocolDto): GenericJObject
             login: protocole.login,
             password: protocole.password,
             port: protocole.port,
-            protocolType: { // TODO what is this shit. hardcode HTTP for now.
+            protocolType: {
                 "$": {
-                    "name": "HTTP"
+                    "name": protocole.protocolType.name
                 },
                 "$class": {
                     "name": "fr.soe.a3s.constant.ProtocolType",
