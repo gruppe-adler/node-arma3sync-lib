@@ -5,7 +5,7 @@ import {A3sDirectory} from './service/A3sDirectory';
 import * as config from 'config';
 import {RepoBuildService} from './service/RepoBuildService';
 import {SyncComparisonService} from './service/sync/SyncComparisonService';
-export {setLogger} from './config';
+export {setFileHasher, setLogger} from './config';
 
 if (!config.has('arma3sync-lib.repoName')) {
     throw new Error('repoName not configured');
