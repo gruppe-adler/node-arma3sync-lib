@@ -129,6 +129,42 @@ describe(modDiff.name, () => {
             expect(result.deletedMods).toEqual([]);
         }, done, modDiff);
     });
+    it('properly handles existance of addons folder', (done) => {
+        runDiffTest([{
+            a: new SyncTreeLeaf('x.file', '@ace', '/@ace/x.file', 'something', 42),
+            b: new SyncTreeLeaf('x.file', '@ace', '/@ace/x.file', 'something', 42),
+        }], (result: ModDiffResult) => {
+            expect(result.changedMods).toEqual([]);
+            expect(result.newMods).toEqual([]);
+        }, done, modDiff);
+    });
+    it('properly handles lack of addons folder', (done) => {
+        runDiffTest([{
+            a: new SyncTreeLeaf('x.file', '', '/@ace/x.file', 'something', 42),
+            b: new SyncTreeLeaf('x.file', '', '/@ace/x.file', 'something', 42),
+        }], (result: ModDiffResult) => {
+            expect(result.changedMods).toEqual([]);
+            expect(result.newMods).toEqual([]);
+        }, done, modDiff);
+    });
+    it('properly handles addition of addons folder', (done) => {
+        runDiffTest([{
+            a: new SyncTreeLeaf('x.file', '', '/@ace/x.file', 'something', 42),
+            b: new SyncTreeLeaf('x.file', '@ace', '/@ace/x.file', 'something', 42),
+        }], (result: ModDiffResult) => {
+            expect(result.changedMods).toEqual([]);
+            expect(result.newMods).toEqual([]);
+        }, done, modDiff);
+    });
+    it('properly handles removal of addons folder', (done) => {
+        runDiffTest([{
+            a: new SyncTreeLeaf('x.file', '@ace', '/@ace/x.file', 'something', 42),
+            b: new SyncTreeLeaf('x.file', '', '/@ace/x.file', 'something', 42),
+        }], (result: ModDiffResult) => {
+            expect(result.changedMods).toEqual([]);
+            expect(result.newMods).toEqual([]);
+        }, done, modDiff);
+    });
     it('properly aggregates over lots of comparisons', (done) => {
         runDiffTest([
             {

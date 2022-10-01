@@ -61,7 +61,7 @@ export function modDiff(comparisonStream: ParallelSyncStream): Promise<ModDiffRe
     comparisonStream.onLeaf((comparisonContext: ComparisonContext) => {
         const a = comparisonContext.a;
         const b = comparisonContext.b;
-        if (a && b && (a.addon !== b.addon)) {
+        if (a && b && a.addon && b.addon && (a.addon !== b.addon)) {
             throw new Error('something is wrong here, both files should belong to the same addon!');
         }
         const addon = (a && a.addon) || (b && b.addon);
