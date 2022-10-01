@@ -106,6 +106,106 @@ describe(RepoBuildService.name, () => {
 
             done();
         });
+
+        it('updates isAddon correctly when addons folder is added to mod', async (done) => {
+            const initialSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
+                    '@empty' : new SyncTreeBranch('@empty', '/@empty', false, {}, {
+                        'empty.file': new SyncTreeLeaf('empty.file', '', '/@empty/empty.file', 'sha1', 1337)
+                    })
+                }, {});
+            const expectedSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
+                    '@empty' : new SyncTreeBranch('@empty', '/@empty', true, {
+                        'addons': new SyncTreeBranch('addons', '/@empty/addons', false, {}, {})
+                    }, {
+                        'empty.file': new SyncTreeLeaf('empty.file', '@empty', '/@empty/empty.file', 'sha1', 1337)
+                    })
+                } ,{});
+
+            const a3sDirectory = {
+                getSync: jest.fn(() => Promise.resolve(initialSyncTree)),
+                setSync: jest.fn(() => Promise.resolve()),
+                getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
+                setServerInfo: jest.fn(() => Promise.resolve()),
+                getChangelogs: jest.fn(() => Promise.resolve(new Changelogs())),
+                setChangelogs: jest.fn(() => Promise.resolve()),
+            };
+
+            const syncGenerationService = {
+                generateSync: jest.fn(() => Promise.resolve(expectedSyncTree))
+            };
+
+            const expectedZsyncResult = new UpdateResult(1, 3, 3, 7);
+            const zsyncGenerationService = {
+                update: jest.fn(() => Promise.resolve(expectedZsyncResult))
+            };
+            const syncComparisonService = new SyncComparisonService();
+
+            const repoBuildService = new RepoBuildService(
+                a3sDirectory as unknown as A3sDirectory,
+                syncGenerationService as unknown as SyncGenerationService,
+                zsyncGenerationService as unknown as ZSyncGenerationService,
+                syncComparisonService,
+                publicURL,
+                repoName,
+            );
+
+            await repoBuildService.update();
+
+            expect(a3sDirectory.setSync.mock.calls).toHaveLength(1);
+            expect(a3sDirectory.setSync.mock.calls[0]).toEqual([expectedSyncTree]);
+
+            done();
+        });
+
+        it('updates isAddon correctly when addons folder is removed from mod', async (done) => {
+            const initialSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
+                    '@empty' : new SyncTreeBranch('@empty', '/@empty', true, {
+                        'addons': new SyncTreeBranch('addons', '/@empty/addons', false, {}, {})
+                    }, {
+                        'empty.file': new SyncTreeLeaf('empty.file', '@empty', '/@empty/empty.file', 'sha1', 1337)
+                    })
+                } ,{});
+            const expectedSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
+                    '@empty' : new SyncTreeBranch('@empty', '/@empty', false, {}, {
+                        'empty.file': new SyncTreeLeaf('empty.file', '', '/@empty/empty.file', 'sha1', 1337)
+                    })
+                }, {});
+
+            const a3sDirectory = {
+                getSync: jest.fn(() => Promise.resolve(initialSyncTree)),
+                setSync: jest.fn(() => Promise.resolve()),
+                getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
+                setServerInfo: jest.fn(() => Promise.resolve()),
+                getChangelogs: jest.fn(() => Promise.resolve(new Changelogs())),
+                setChangelogs: jest.fn(() => Promise.resolve()),
+            };
+
+            const syncGenerationService = {
+                generateSync: jest.fn(() => Promise.resolve(expectedSyncTree))
+            };
+
+            const expectedZsyncResult = new UpdateResult(1, 3, 3, 7);
+            const zsyncGenerationService = {
+                update: jest.fn(() => Promise.resolve(expectedZsyncResult))
+            };
+            const syncComparisonService = new SyncComparisonService();
+
+            const repoBuildService = new RepoBuildService(
+                a3sDirectory as unknown as A3sDirectory,
+                syncGenerationService as unknown as SyncGenerationService,
+                zsyncGenerationService as unknown as ZSyncGenerationService,
+                syncComparisonService,
+                publicURL,
+                repoName,
+            );
+
+            await repoBuildService.update();
+
+            expect(a3sDirectory.setSync.mock.calls).toHaveLength(1);
+            expect(a3sDirectory.setSync.mock.calls[0]).toEqual([expectedSyncTree]);
+
+            done();
+        });
     });
 
     describe('initializeRepository', () => {
