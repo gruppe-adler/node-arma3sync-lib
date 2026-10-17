@@ -68,4 +68,18 @@ describe(ParallelSyncStream, () => {
         });
         stream.start();
     });
+    it('emits each leaf once when both trees have it', (done) => {
+        const stream = new ParallelSyncStream(deepTree, deepTree);
+        const nodeCount = jest.fn();
+        stream.onLeaf(nodeCount);
+        stream.onEnd(() => {
+            expect(nodeCount).toBeCalledTimes(1);
+            expect(nodeCount).toHaveBeenCalledWith({
+                a: deepTree.branches['@ace'].leaves['file.file'],
+                b: deepTree.branches['@ace'].leaves['file.file'],
+            });
+            done();
+        });
+        stream.start();
+    });
 });
