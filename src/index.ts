@@ -22,8 +22,11 @@ if (!config.has('arma3sync-lib.publicURL')) {
 }
 let publicURL = config.get<string>('arma3sync-lib.publicURL');
 
-export const zsyncGenerationService = new ZSyncGenerationService(publicURL, repoPath, zsyncmake);
-export const syncGenerationService = new SyncGenerationService(repoPath);
+let hashConcurrency = config.has('arma3sync-lib.hashConcurrency') ? config.get<number>('arma3sync-lib.hashConcurrency') : undefined;
+let zsyncConcurrency = config.has('arma3sync-lib.zsyncConcurrency') ? config.get<number>('arma3sync-lib.zsyncConcurrency') : undefined;
+
+export const zsyncGenerationService = new ZSyncGenerationService(publicURL, repoPath, zsyncmake, zsyncConcurrency);
+export const syncGenerationService = new SyncGenerationService(repoPath, hashConcurrency);
 export const a3sDirectory = new A3sDirectory(repoPath + '/.a3s');
 export const repoBuildService = new RepoBuildService(
     a3sDirectory,

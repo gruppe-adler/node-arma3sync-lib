@@ -1,6 +1,8 @@
 import {promisify} from 'util';
 import {Path} from '../../util/aliases';
 import {Dirent, readdir, stat, unlink} from 'fs';
+import {cpus} from 'os';
+import {createLimiter, Limiter} from '../../util/limit';
 
 function sum(numbers: number[]): number {
     return numbers.reduce((a, b) => a + b, 0)
@@ -57,19 +59,26 @@ const zSyncFilenameExtension = '.zsync';
  * use the CLI [zsyncmake](https://linux.die.net/man/1/zsyncmake) tool. yes.
  */
 export class ZSyncGenerationService {
+    private limit: Limiter;
 
+    /**
+     * @param zsyncConcurrency max number of zsyncmake processes running at the same time
+     */
     constructor(
         private repoPublicURL: string, /* ex. http://gruppe-adler.de/arma3sync */
         private repoPath: Path,  /* ex. /var/lib/arma3sync */
-        private zsyncmake: (file: Path) => void,
-    ) {}
+        private zsyncmake: (file: Path) => Promise<unknown> | void,
+        zsyncConcurrency: number = cpus().length || 1,
+    ) {
+        this.limit = createLimiter(zsyncConcurrency);
+    }
 
     /**
      * create-overwrite a single zsync file
      */
     public async writeSingle(file: Path): Promise<void> {
         ZSyncGenerationService.checkPath(file);
-        return this.zsyncmake(file);
+        await this.limit(async () => this.zsyncmake(file));
     }
 
     private async writeRelativeSingle(relativePath: Path, filename: string): Promise<void> {
