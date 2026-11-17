@@ -1,14 +1,26 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "node16",
+    "moduleResolution": "node16",
+    "types": ["node", "jest"],
+    "rootDir": "./src",
+    "outDir": "./dist",
     "declaration": true,
-    "outDir": "./dist"
+
+    "strict": true,
+    // TODO: these strict checks still report errors; fix the code and remove the opt-outs.
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
+
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts"
   ]
 }

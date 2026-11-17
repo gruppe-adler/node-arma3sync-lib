@@ -7,12 +7,11 @@ util.setModuleDefaults("arma3sync-lib", {
 });
 
 describe(zsyncmake.name, () => {
-    it('creates good command line', async (done) => {
+    it('creates good command line', async () => {
         let cmdLine = '';
 
         await zsyncmakeWithExec('/needs-update', (cmd, callback) => {cmdLine = cmd; callback(null, {stdout: '', stderr: ''});});
 
         expect(cmdLine).toBe("zsyncmake -eu 'http://foo/needs-update' -o '/var/lib/repo/needs-update.zsync' '/var/lib/repo/needs-update'");
-        done();
     })
 });

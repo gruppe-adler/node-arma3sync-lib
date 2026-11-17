@@ -10,7 +10,7 @@ describe(SyncGenerationService.name, () => {
     describe('generateSync', function () {
         const service = new SyncGenerationService(a3sExampleModsDir);
         const generatingSync = service.generateSync();
-        it('walks the directory tree', async (done) => {
+        it('walks the directory tree', async () => {
             const sync = await generatingSync;
 
             expect(sync).toBeTruthy();
@@ -23,9 +23,8 @@ describe(SyncGenerationService.name, () => {
             const addons = tfar.branches['addons'] as SyncTreeBranch;
             expect(addons).toBeInstanceOf(SyncTreeBranch);
             expect(addons.isAddon).toBe(false);
-            done();
         });
-        it('follows symlinks!', async (done) => {
+        it('follows symlinks!', async () => {
             const sync = await generatingSync;
 
             expect(sync).toBeTruthy();
@@ -33,17 +32,15 @@ describe(SyncGenerationService.name, () => {
             expect(sync.branches['@symlinkedMod'].name).toBe('@symlinkedMod');
             expect(sync.branches['@symlinkedMod'].isAddon).toBe(true);
             expect(sync.branches['@symlinkedMod'].branches['addons'].name).toBe('addons');
-            done();
         });
-        it('follows symlinks and correctly sha1s an empty file to "0" (yeah thats stupid)', async (done) => {
+        it('follows symlinks and correctly sha1s an empty file to "0" (yeah thats stupid)', async () => {
             const sync = await generatingSync;
 
             expect(sync).toBeTruthy();
             expect(sync.branches['@symlinkedMod'].name).toBe('@symlinkedMod');
             expect(sync.branches['@symlinkedMod'].branches['addons'].leaves['foo'].sha1).toBe("0");
-            done();
         });
-        it('lists & checksums files', async (done) => {
+        it('lists & checksums files', async () => {
             const sync: SyncTreeBranch = await generatingSync;
             const addons = sync.branches['@tfar_autoswitch'].branches['addons'];
             expect(addons).toBeInstanceOf(SyncTreeBranch);
@@ -54,21 +51,18 @@ describe(SyncGenerationService.name, () => {
             expect(modCpp.size).toBe(192);
             expect(modCpp.sha1).toBe("fbfdc8d4006332b93c0a1bc913f96346919ea576");
 
-            done();
         });
-        it('perfectly reproduces the test file', async (done) => {
+        it('perfectly reproduces the test file', async () => {
             const sync = await generatingSync;
             expect(sync).toEqual(SyncTreeBranch.fromSyncTreeRoot(exampleSync));
-            done();
         });
-        it('declares an empty file to have a sha1 of "0" (yes thats how Arma3Sync does it)', async (done) => {
+        it('declares an empty file to have a sha1 of "0" (yes thats how Arma3Sync does it)', async () => {
             const sync = await generatingSync;
             const tfar = sync.branches['@tfar_autoswitch'];
             const emptyFile = tfar.leaves['emptyFile.md'];
 
             expect(emptyFile.size).toBe(0);
             expect(emptyFile.sha1).toBe("0");
-            done();
         });
     });
     describe('generateSync#brokenLink', () => {

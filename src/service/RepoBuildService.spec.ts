@@ -31,7 +31,7 @@ describe(RepoBuildService.name, () => {
     });
 
     describe('update', () => {
-        it('uses zsyncservice to walk over everything', async (done) => {
+        it('uses zsyncservice to walk over everything', async () => {
             const a3sDirectory = {
                 getSync: jest.fn(() => Promise.resolve(new SyncTreeBranch('', '', false, {}, {}))),
                 setSync: jest.fn(() => Promise.resolve()),
@@ -104,10 +104,9 @@ describe(RepoBuildService.name, () => {
             expect(newChangelog.updatedAddons).toEqual([]);
             expect(newChangelog.deletedAddons).toEqual([]);
 
-            done();
         });
 
-        it('updates isAddon correctly when addons folder is added to mod', async (done) => {
+        it('updates isAddon correctly when addons folder is added to mod', async () => {
             const initialSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
                     '@empty' : new SyncTreeBranch('@empty', '/@empty', false, {}, {
                         'empty.file': new SyncTreeLeaf('empty.file', '', '/@empty/empty.file', 'sha1', 1337)
@@ -154,10 +153,9 @@ describe(RepoBuildService.name, () => {
             expect(a3sDirectory.setSync.mock.calls).toHaveLength(1);
             expect(a3sDirectory.setSync.mock.calls[0]).toEqual([expectedSyncTree]);
 
-            done();
         });
 
-        it('updates isAddon correctly when addons folder is removed from mod', async (done) => {
+        it('updates isAddon correctly when addons folder is removed from mod', async () => {
             const initialSyncTree: SyncTreeBranch = new SyncTreeBranch('', '', false, {
                     '@empty' : new SyncTreeBranch('@empty', '/@empty', true, {
                         'addons': new SyncTreeBranch('addons', '/@empty/addons', false, {}, {})
@@ -204,12 +202,11 @@ describe(RepoBuildService.name, () => {
             expect(a3sDirectory.setSync.mock.calls).toHaveLength(1);
             expect(a3sDirectory.setSync.mock.calls[0]).toEqual([expectedSyncTree]);
 
-            done();
         });
     });
 
     describe('initializeRepository', () => {
-        it('creates all the repo files', async (done) => {
+        it('creates all the repo files', async () => {
             const a3sDirectory = {
                 setRawSync: jest.fn(() => Promise.resolve()),
                 getServerInfo: jest.fn(() => Promise.resolve(oldServerInfo)),
@@ -260,10 +257,9 @@ describe(RepoBuildService.name, () => {
             expect(protocolType.name).toBe('HTTP');
             expect(protocolType.prompt).toBe('http://');
 
-            done();
         });
 
-        it('supports HTTPS', async (done) => {
+        it('supports HTTPS', async () => {
             const publicURL = 'https://foo'
 
             const a3sDirectory = {
@@ -299,7 +295,6 @@ describe(RepoBuildService.name, () => {
             expect(protocolType.name).toBe('HTTPS');
             expect(protocolType.prompt).toBe('https://');
 
-            done();
         })
     });
 });

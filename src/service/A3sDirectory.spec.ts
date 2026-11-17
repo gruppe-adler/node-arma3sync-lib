@@ -109,25 +109,23 @@ describe(A3sDirectory.name, () => {
     });
 
     describe('getSync', () => {
-        it('skips on the /racine as root name', async (done) => {
+        it('skips on the /racine as root name', async () => {
             const sync: SyncTreeBranch = await examplesDirectory.getSync();
             expect(sync.name).toBe('');
             expect(sync.path).toBe('');
             expect(sync.branches['@tfar_autoswitch'].name).toBe('@tfar_autoswitch');
             expect(sync.branches['@tfar_autoswitch'].path).toBe('/@tfar_autoswitch');
-            done();
         });
     });
 
     describe('setSync', () => {
-        it('nicely puts everything into the dto etc', async (done) => {
+        it('nicely puts everything into the dto etc', async () => {
             const sync: SyncTreeBranch = await examplesDirectory.getSync();
 
             const dtoTree = sync.toDto();
 
             expect(dtoTree).toEqual(getExampleSync());
 
-            done();
         });
     });
 
@@ -146,45 +144,41 @@ describe(A3sDirectory.name, () => {
     });
 
     describe('getServerInfo', () => {
-        it('does shit', async (done) => {
+        it('does shit', async () => {
             const serverInfo = await examplesDirectory.getServerInfo();
             expect(serverInfo).toEqual(getExampleServerInfo());
 
-            done();
         });
     });
     describe('setServerInfo', () => {
-        it('does shit', async (done) => {
+        it('does shit', async () => {
             const access = new A3sDirectory('/tmp');
             const serverInfo: A3sServerInfoDto = getExampleServerInfo();
 
             await access.setServerInfo(serverInfo);
             const reReadServerInfo = await access.getServerInfo();
             expect(reReadServerInfo).toEqual(getExampleServerInfo());
-            done();
         });
     });
 
     describe('setChangelogs', () => {
-        it('writes changelog entries', async (done) => {
+        it('writes changelog entries', async () => {
             const access = new A3sDirectory('/tmp');
             const changelogs: A3sChangelogsDto = getExampleChangelogs();
 
             await access.setChangelogs(changelogs);
             const reReadChangelog = await access.getChangelogs();
             expect(reReadChangelog).toEqual(getExampleChangelogs());
-            done();
         });
     });
 
     describe('setAutoconfig', () => {
-        it('writes autoconfig', async (done) => {
+        it('writes autoconfig', async () => {
             const access = new A3sDirectory('/tmp');
             const autoconfig = getExampleAutoconfig();
             await access.setAutoconfig(autoconfig);
             const reReadAutoconfig = await access.getAutoconfig();
             expect(reReadAutoconfig).toEqual(getExampleAutoconfig());
-            done();
         });
     });
 });

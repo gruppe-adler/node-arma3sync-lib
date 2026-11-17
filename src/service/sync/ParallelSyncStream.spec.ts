@@ -53,7 +53,7 @@ describe(ParallelSyncStream, () => {
         const nodeCount = jest.fn();
         stream.onLeaf(nodeCount);
         stream.onEnd(() => {
-            expect(nodeCount).toBeCalledTimes(2);
+            expect(nodeCount).toHaveBeenCalledTimes(2);
 
             expect(nodeCount).toHaveBeenCalledWith({
                 a: deepTree.branches['@ace'].leaves['file.file'],
