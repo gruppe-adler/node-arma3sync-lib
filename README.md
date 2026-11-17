@@ -21,7 +21,9 @@ Currently uses [config](https://www.npmjs.com/package/config) and expects this c
   "arma3sync-lib": {
     "publicURL": "", // public repository URL, ex. `http://mods.my-clan.com/`
     "repoName": "", // repository name
-    "repoPath": "" // file path to the repository, ex. `/var/lib/a3s/mods`
+    "repoPath": "", // file path to the repository, ex. `/var/lib/a3s/mods`
+    "hashConcurrency": 4, // optional: max number of files hashed at the same time, defaults to UV_THREADPOOL_SIZE, or 4 if unset
+    "zsyncConcurrency": 8 // optional: max number of parallel zsyncmake processes, defaults to number of CPUs
   }
 }
 ```
