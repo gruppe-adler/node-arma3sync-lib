@@ -1,8 +1,6 @@
 import {UpdateResult, ZSyncGenerationService} from './ZSyncGenerationService';
 import {readdirSync, statSync} from 'fs';
-import {ncp} from 'ncp';
-import {utimesSync, mkdirSync, writeFileSync} from 'fs';
-import {promisify} from 'util';
+import {utimesSync, mkdirSync, writeFileSync, promises as fsPromises} from 'fs';
 import {zsyncmake} from './zsyncmake';
 
 const stoneAge = new Date('1981-10-11');
@@ -11,7 +9,7 @@ const notOld = new Date('1996-12-30');
 
 async function prepareFixture(): Promise<string> {
     const tmp = `/tmp/${Math.random()}`;
-    await promisify(ncp)(__dirname + '/../../../resources/test/zsync-mock-fs', tmp);
+    await fsPromises.cp(__dirname + '/../../../resources/test/zsync-mock-fs', tmp, {recursive: true});
     utimesSync(`${tmp}/does-not-need-update`, stoneAge, stoneAge);
     utimesSync(`${tmp}/does-not-need-update.zsync`, stoneAge, stoneAge);
     utimesSync(`${tmp}/does-not-need-update2`, stoneAge, stoneAge);
@@ -69,7 +67,7 @@ describe(ZSyncGenerationService.name, () => {
     });
     describe('clearAll', () => {
 
-        it('recursively deletes everything named *.zsync', async (done) => {
+        it('recursively deletes everything named *.zsync', async () => {
             const dir = await prepareFixture();
 
             let service = new ZSyncGenerationService(
@@ -86,7 +84,6 @@ describe(ZSyncGenerationService.name, () => {
             expect(readdirSync(`${dir}/foo`)).toEqual(['bar', 'missing']);
             expect(readdirSync(`${dir}/foo/bar`)).toEqual(['needs-update']);
 
-            done();
         });
     });
 
@@ -94,7 +91,7 @@ describe(ZSyncGenerationService.name, () => {
 
         let service;
         let dir;
-        beforeEach(async (done) => {
+        beforeEach(async () => {
             dir = await prepareFixture();
             service = new ZSyncGenerationService(
                 'http://foo',
@@ -104,33 +101,28 @@ describe(ZSyncGenerationService.name, () => {
                     return Promise.resolve({stdout: [], stderr: []});
                 },
             );
-            done();
         });
 
-        it('returns good create/update/delete/skip counts', async (done) => {
+        it('returns good create/update/delete/skip counts', async () => {
             const counts = await service.update();
             expect(counts).toEqual(new UpdateResult(1, 1, 1, 2));
-            done();
         });
-        it('updates files older than certain date', async (done) => {
+        it('updates files older than certain date', async () => {
             await service.update();
             expect(args[0]).toContain('/foo/bar/needs-update');
-            done();
         });
-        it('generates missing files', async (done) => {
+        it('generates missing files', async () => {
             await service.update();
             expect(args[1]).toContain('/foo/missing');
-            done();
 
         });
-        it('does *not* walk into the .a3s directory, because that would be stupid', async (done) => {
+        it('does *not* walk into the .a3s directory, because that would be stupid', async () => {
             mkdirSync(dir + '/.a3s');
             writeFileSync(dir + '/.a3s/autoconfig', 'foo content');
             await service.update();
             expect(args.every(argset => {
                 return argset[0].indexOf('.a3s') === -1;
             })).toBeTruthy();
-            done();
         });
     });
 });

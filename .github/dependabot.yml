@@ -1,0 +1,31 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "TheWillard"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "TheWillard"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+      dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Keep @types/node on the major that matches the lowest supported Node version.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]

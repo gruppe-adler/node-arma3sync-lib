@@ -2,7 +2,7 @@ import {ZSyncGenerationService} from './service/zsync/ZSyncGenerationService';
 import {zsyncmake} from './service/zsync/zsyncmake';
 import {SyncGenerationService} from './service/sync/SyncGenerationService';
 import {A3sDirectory} from './service/A3sDirectory';
-import * as config from 'config';
+import config = require('config');
 import {RepoBuildService} from './service/RepoBuildService';
 import {SyncComparisonService} from './service/sync/SyncComparisonService';
 export {setFileHasher, setLogger} from './config';

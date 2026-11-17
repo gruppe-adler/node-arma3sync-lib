@@ -75,7 +75,7 @@ async function runDiffTest<T>(
 
 describe(modDiff.name, () => {
 
-    it('recognizes removed mods', async (done) => {
+    it('recognizes removed mods', (done) => {
         runDiffTest(
             [{
                 a: new SyncTreeLeaf('x.file', '@ace', '/@ace/x.file', 'something', 42),
