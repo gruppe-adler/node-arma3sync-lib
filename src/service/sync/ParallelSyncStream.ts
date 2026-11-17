@@ -55,7 +55,8 @@ export class ParallelSyncStream {
     private getSubnodeIntersection(a: SyncTreeNode|undefined, b: SyncTreeNode|undefined): string[] {
         const namesInA = (a instanceof SyncTreeBranch) ? Object.keys(a.branches).concat(Object.keys(a.leaves)) : [];
         const namesInB = (b instanceof SyncTreeBranch) ? Object.keys(b.branches).concat(Object.keys(b.leaves)) : [];
+        const namesInASet = new Set(namesInA);
 
-        return namesInB.filter(nameInB => namesInA.indexOf(nameInB) === -1).concat(namesInA);
+        return namesInB.filter(nameInB => !namesInASet.has(nameInB)).concat(namesInA);
     }
 }
