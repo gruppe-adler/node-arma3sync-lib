@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@types/node": "^20.19.43",
-    "config": "3",
+    "config": "5",
     "java.io": "2"
   },
   "keywords": [],
